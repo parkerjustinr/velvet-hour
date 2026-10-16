@@ -150,6 +150,29 @@
     return sectionShell("speakers", sp.heading, (sp.intro ? '<p class="lede">' + copy(sp.intro) + "</p>" : "") + featured + grid);
   };
 
+  R.dancecam = function () {
+    var c = D.dancecam;
+    // Still graphic for the idle and no-camera states: a small lit dance floor.
+    var lit = { 2: 1, 5: 2, 9: 3, 12: 2, 14: 1, 19: 3, 20: 1, 23: 2, 26: 3, 29: 1 };
+    var squares = "";
+    for (var i = 0; i < 32; i++) squares += "<i" + (lit[i] ? ' class="l' + lit[i] + '"' : "") + "></i>";
+    return sectionShell("dancecam", c.heading,
+      '<div class="cam">' +
+        '<div class="cam-frame" id="cam-frame">' +
+          '<div class="cam-still" aria-hidden="true">' + squares + "</div>" +
+          '<video class="cam-video" id="cam-video" playsinline muted autoplay hidden aria-label="Your camera, mirrored"></video>' +
+          '<p class="cam-idle" id="cam-idle">' + copy(c.idleLine) + "</p>" +
+          '<p class="cam-lower" id="cam-lower" hidden><span class="cam-live">Live</span><span id="cam-caption" aria-live="polite"></span></p>' +
+        "</div>" +
+        '<div class="cam-side">' +
+          (c.intro ? '<p class="lede">' + copy(c.intro) + "</p>" : "") +
+          '<div class="cam-controls"><button type="button" class="btn btn-primary" id="cam-on">' + esc(c.onLabel) + "</button>" +
+          '<button type="button" class="btn" id="cam-off" hidden>' + esc(c.offLabel) + "</button></div>" +
+          '<p class="cam-privacy">' + copy(c.privacy) + "</p>" +
+        "</div>" +
+      "</div>");
+  };
+
   R.schedule = function () {
     var s = D.schedule;
     var showTz = USER_TZ && USER_TZ !== D.meta.timezone;
@@ -403,6 +426,92 @@
     });
   }
 
+  // ---------- dance cam ----------
+  // Shows the visitor's own camera, mirrored, in the jumbotron. The stream goes to the <video> element only:
+  // nothing is recorded, saved or sent. No camera or no permission falls back to the still graphic.
+  function wireDanceCam() {
+    var on = $("cam-on"), off = $("cam-off"), video = $("cam-video");
+    if (!on || !video) return;
+    var c = D.dancecam, stream = null, capTimer = null, capIndex = 0;
+    function caption() { $("cam-caption").textContent = c.captions[capIndex++ % c.captions.length]; }
+    function stopCam() {
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+      clearInterval(capTimer); capTimer = null;
+      video.pause(); video.srcObject = null; video.hidden = true;
+      $("cam-lower").hidden = true;
+      $("cam-frame").classList.remove("is-live");
+      off.hidden = true; on.hidden = false; on.disabled = false;
+    }
+    function fallback() {
+      stopCam();
+      $("cam-idle").innerHTML = copy(c.fallbackLine);
+      $("cam-frame").classList.add("is-fallback");
+    }
+    on.addEventListener("click", function () {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { fallback(); return; }
+      on.disabled = true;
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }).then(function (s) {
+        stream = s;
+        video.muted = true;
+        video.srcObject = s;
+        video.hidden = false;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+        $("cam-frame").classList.remove("is-fallback");
+        $("cam-frame").classList.add("is-live");
+        $("cam-lower").hidden = false;
+        capIndex = 0; caption();
+        capTimer = setInterval(caption, 3200);
+        on.hidden = true; off.hidden = false; off.focus();
+      }).catch(fallback);
+    });
+    off.addEventListener("click", function () { stopCam(); on.focus(); });
+    window.addEventListener("pagehide", stopCam);
+  }
+
+  // ---------- confetti cannon ----------
+  // Two bursts from the bottom corners in the three light colors, about 2 seconds, then the canvas goes away.
+  function fireConfetti() {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var cv = document.createElement("canvas"), ctx = cv.getContext && cv.getContext("2d");
+    if (!ctx) return;
+    var css = getComputedStyle(document.documentElement);
+    var colors = ["--track-1", "--track-2", "--track-3"].map(function (v) { return css.getPropertyValue(v).trim(); });
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), w = window.innerWidth, h = window.innerHeight;
+    cv.className = "confetti";
+    cv.setAttribute("aria-hidden", "true");
+    cv.width = w * dpr; cv.height = h * dpr;
+    ctx.scale(dpr, dpr);
+    document.body.appendChild(cv);
+    var bits = [], n = Math.round(Math.min(110, w / 6));
+    [0, 1].forEach(function (side) {
+      for (var i = 0; i < n; i++) {
+        var angle = (side ? 180 - (50 + Math.random() * 35) : 50 + Math.random() * 35) * Math.PI / 180;
+        var speed = h * (0.012 + Math.random() * 0.012);
+        bits.push({ x: side ? w : 0, y: h, vx: Math.cos(angle) * speed, vy: -Math.sin(angle) * speed,
+          r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.4, s: 6 + Math.random() * 6, c: colors[i % 3] });
+      }
+    });
+    var t0 = null, DUR = 2000;
+    function frame(t) {
+      if (t0 === null) t0 = t;
+      var k = (t - t0) / DUR;
+      if (k >= 1) { cv.remove(); return; }
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalAlpha = k > 0.75 ? (1 - k) / 0.25 : 1;
+      bits.forEach(function (b) {
+        b.vy += h * 0.0006; b.vx *= 0.985; b.vy *= 0.985;
+        b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+        ctx.fillStyle = b.c; ctx.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2);
+        ctx.restore();
+      });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
   // ---------- wiring ----------
   function wireTabs() {
     var root = $("schedule");
@@ -513,6 +622,7 @@
         }).join("") + '<button type="button" class="btn btn-small" id="reg-again">Register someone else</button></div>' +
       "</div>";
     $("reg-confirm").focus();
+    fireConfetti();
     $("reg-again").addEventListener("click", function () {
       var sec = $("register");
       sec.outerHTML = R.register();
@@ -598,7 +708,7 @@
       D = data;
       renderHero();
       renderChrome();
-      wireTabs(); wireMatrix(); wireForm(); wireGlobal();
+      wireTabs(); wireMatrix(); wireForm(); wireGlobal(); wireDanceCam();
       danceFloor(); lightScenes();
       if (location.hash.length > 1) {
         var target = $(location.hash.slice(1));

@@ -19,6 +19,7 @@
   "sections": [
     { "id": "about", "label": "About", "on": true },
     { "id": "speakers", "label": "Lineup", "on": true },
+    { "id": "dancecam", "label": "Dance Cam", "on": true },
     { "id": "schedule", "label": "Run of show", "on": true },
     { "id": "tickets", "label": "Tickets", "on": true },
     { "id": "sponsors", "label": "Sponsors", "on": false },
@@ -163,6 +164,25 @@
       { "title": "Bag policy", "body": "[PLACEHOLDER] Clear bags or a small clutch only. No backpacks. Every bag is checked at the door." },
       { "title": "ID", "body": "[PLACEHOLDER] Bring a photo ID. You need it for a drinks wristband, and Front Rail and Soundcheck VIP check-in matches the ID to the name on the ticket." },
       { "title": "Accessibility", "body": "[PLACEHOLDER] Step-free entry, accessible balcony seating and a raised viewing platform beside the dance floor. Contact the box office before the show to arrange a spot or a companion seat." }
+    ]
+  },
+
+  "dancecam": {
+    "heading": "Dance Cam",
+    "intro": "On the night, the Dance Cam roams the floor and the balcony and puts you on the big screen. Try it here first.",
+    "onLabel": "Put me on the Dance Cam",
+    "offLabel": "Turn off camera",
+    "privacy": "Nothing is recorded, saved or sent. Your picture only shows on this screen, and it stops when you turn the camera off or leave the page.",
+    "idleLine": "Your spot on the big screen",
+    "fallbackLine": "No camera today? No problem. The real Dance Cam will find you on the night.",
+    "captions": [
+      "Show us your best move",
+      "Front row energy",
+      "Who taught you that?",
+      "Velvet Hour, are you ready?",
+      "Biggest smile in the building",
+      "Now do it in slow motion",
+      "Somebody get this dancer a spotlight"
     ]
   },
 
