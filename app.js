@@ -169,23 +169,33 @@
 
   R.dancecam = function () {
     var c = D.dancecam;
-    // Still graphic for the idle and no-camera states: a small lit dance floor.
-    var lit = { 2: 1, 5: 2, 9: 3, 12: 2, 14: 1, 19: 3, 20: 1, 23: 2, 26: 3, 29: 1 };
-    var squares = "";
-    for (var i = 0; i < 32; i++) squares += "<i" + (lit[i] ? ' class="l' + lit[i] + '"' : "") + "></i>";
     return sectionShell("dancecam", c.heading,
       '<div class="cam">' +
-        '<div class="cam-frame" id="cam-frame">' +
-          '<div class="cam-still" aria-hidden="true">' + squares + "</div>" +
-          '<video class="cam-video" id="cam-video" playsinline muted autoplay hidden aria-label="Your camera, mirrored"></video>' +
-          '<p class="cam-idle" id="cam-idle">' + copy(c.idleLine) + "</p>" +
-          '<p class="cam-lower" id="cam-lower" hidden><span class="cam-live">Live</span><span id="cam-caption" aria-live="polite"></span></p>' +
-        "</div>" +
-        '<div class="cam-side">' +
-          (c.intro ? '<p class="lede">' + copy(c.intro) + "</p>" : "") +
-          '<div class="cam-controls"><button type="button" class="btn btn-primary" id="cam-on">' + esc(c.onLabel) + "</button>" +
-          '<button type="button" class="btn" id="cam-off" hidden>' + esc(c.offLabel) + "</button></div>" +
+        (c.intro ? '<p class="lede cam-intro">' + copy(c.intro) + "</p>" : "") +
+        '<div class="cam-main">' +
+          '<div class="cam-frame" id="cam-frame">' +
+            '<canvas class="cam-canvas" id="cam-canvas" width="960" height="540" role="img" aria-label="' + esc(c.demoWho) + '"></canvas>' +
+            '<video class="cam-video" id="cam-video" playsinline muted autoplay aria-hidden="true"></video>' +
+            '<p class="cam-bug" aria-hidden="true">' + esc(c.bug) + "</p>" +
+            '<p class="cam-tally"><span class="cam-dot" aria-hidden="true"></span><span id="cam-tally">' + esc(c.demoTally) + "</span></p>" +
+            '<div class="cam-lower"><p class="cam-who" id="cam-who">' + esc(c.demoWho) + '</p><p class="cam-caption" id="cam-caption"></p></div>' +
+          "</div>" +
+          '<div class="cam-fx" role="group" aria-label="Effects">' + c.effects.map(function (fx, i) {
+            return '<button type="button" class="fx-btn" data-fx="' + esc(fx.id) + '" aria-pressed="' + (i === 0) + '">' + esc(fx.label) + "</button>";
+          }).join("") + "</div>" +
+          '<div class="cam-controls">' +
+            '<button type="button" class="btn btn-primary" id="cam-on">' + esc(c.onLabel) + "</button>" +
+            '<button type="button" class="btn" id="cam-off" hidden>' + esc(c.offLabel) + "</button>" +
+            '<button type="button" class="btn" id="cam-snap">' + esc(c.snapLabel) + "</button>" +
+          "</div>" +
           '<p class="cam-privacy">' + copy(c.privacy) + "</p>" +
+          '<p class="cam-status" id="cam-status" role="status"></p>' +
+        "</div>" +
+        '<div class="cam-shot" id="cam-shot" hidden>' +
+            '<img class="polaroid" id="cam-shot-img" alt="' + esc(c.snapAlt) + '">' +
+            '<div class="cam-shot-actions"><a class="btn btn-primary" id="cam-save" href="#" download="velvet-hour-dance-cam.png">' + esc(c.saveLabel) + "</a>" +
+            '<button type="button" class="btn" id="cam-shot-close">' + esc(c.closeLabel) + "</button></div>" +
+            '<p class="hint">' + copy(c.saveHint) + "</p>" +
         "</div>" +
       "</div>");
   };
@@ -471,47 +481,286 @@
   }
 
   // ---------- dance cam ----------
-  // Shows the visitor's own camera, mirrored, in the jumbotron. The stream goes to the <video> element only:
-  // nothing is recorded, saved or sent. No camera or no permission falls back to the still graphic.
+  // A 1970s TV dance show broadcast. Each frame, the camera (mirrored) or the demo dancer is drawn into a
+  // canvas and the chosen effect runs on it. Everything happens in this browser: nothing is recorded,
+  // uploaded or sent. Snapshots stay on the device unless the visitor saves them, to their own device.
+  // Safety: no full-frame flashes, nothing blinks faster than about once a second, and with reduced
+  // motion every effect is drawn still and the demo dancer does not bounce.
   function wireDanceCam() {
-    var on = $("cam-on"), off = $("cam-off"), video = $("cam-video");
-    if (!on || !video) return;
-    var c = D.dancecam, stream = null, capTimer = null, capIndex = 0;
-    function caption() { $("cam-caption").textContent = c.captions[capIndex++ % c.captions.length]; }
-    function stopCam() {
-      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
-      stream = null;
-      clearInterval(capTimer); capTimer = null;
-      video.pause(); video.srcObject = null; video.hidden = true;
-      $("cam-lower").hidden = true;
-      $("cam-frame").classList.remove("is-live");
-      off.hidden = true; on.hidden = false; on.disabled = false;
+    var cv = $("cam-canvas"), video = $("cam-video"), sec = $("dancecam");
+    if (!cv || !cv.getContext) return;
+    var c = D.dancecam, ctx = cv.getContext("2d"), W = cv.width, H = cv.height, K = H / 360;
+    var still = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+    var css = getComputedStyle(document.documentElement);
+    function tok(n) { return css.getPropertyValue(n).trim(); }
+    var COL = { bg: tok("--bg"), deep: tok("--bg-deep"), fg: tok("--fg"), chrome: tok("--chrome"), gold: tok("--gold"),
+      lights: [tok("--track-1"), tok("--track-2"), tok("--track-3")] };
+    var fx = c.effects[0].id, stream = null, live = false, raf = null, onScreen = !("IntersectionObserver" in window);
+    var capIndex = 0, shotUrl = null;
+    function makeCanvas(w, h) { var x = document.createElement("canvas"); x.width = w; x.height = h; return x; }
+    function status(msg) { $("cam-status").textContent = msg || ""; }
+
+    // ----- demo picture: an illustrated performer on a velvet stage -----
+    var stage = makeCanvas(W, H), dancer = makeCanvas(W, H), demo = makeCanvas(W, H);
+    (function paintStage(g) {
+      g.scale(K, K);
+      g.fillStyle = COL.bg; g.fillRect(0, 0, 640, 360);
+      g.fillStyle = COL.deep;
+      for (var x = 6; x < 640; x += 34) g.fillRect(x, 0, 14, 250);   // velvet curtain folds
+      g.fillStyle = "rgba(247, 234, 211, 0.12)";                        // follow spot
+      g.beginPath(); g.moveTo(296, 0); g.lineTo(344, 0); g.lineTo(440, 300); g.lineTo(200, 300); g.closePath(); g.fill();
+      for (var j = 0; j < 3; j++) {                                     // light-up floor
+        for (var i = 0; i < 16; i++) {
+          g.fillStyle = (i + j) % 3 === 0 ? COL.lights[(i + j * 2) % 3] : COL.deep;
+          g.fillRect(i * 40 + 1, 250 + j * 37 + 1, 38, 35);
+        }
+      }
+    })(stage.getContext("2d"));
+    (function paintDancer(g) {
+      g.scale(K, K);
+      var skin = "#8d5a3b";
+      g.fillStyle = COL.deep; g.beginPath(); g.arc(320, 104, 44, 0, Math.PI * 2); g.fill();      // hair
+      g.fillStyle = skin; g.fillRect(312, 132, 16, 20);                                            // neck
+      g.beginPath(); g.arc(320, 122, 22, 0, Math.PI * 2); g.fill();                                // face
+      g.fillStyle = COL.deep; g.fillRect(304, 114, 32, 8);                                         // shades
+      var suit = new Path2D("M286 148 L354 148 L344 232 L348 300 L360 334 L318 334 L320 262 L316 334 L278 334 L292 300 L296 232 Z");
+      g.fillStyle = COL.gold; g.fill(suit);                                                        // jumpsuit
+      g.save(); g.clip(suit); g.fillStyle = "rgba(247, 234, 211, 0.75)";
+      for (var n = 0; n < 160; n++) { g.beginPath(); g.arc(280 + (n * 37) % 82, 148 + (n * 53) % 188, 1.4, 0, Math.PI * 2); g.fill(); }
+      g.restore();
+      g.fillStyle = skin; g.beginPath(); g.moveTo(308, 148); g.lineTo(320, 174); g.lineTo(332, 148); g.closePath(); g.fill();
+      g.fillStyle = COL.chrome; g.fillRect(296, 224, 48, 8); g.fillRect(276, 334, 44, 10); g.fillRect(318, 334, 44, 10);
+      g.strokeStyle = COL.gold; g.lineWidth = 16; g.lineCap = "round"; g.lineJoin = "round";
+      g.beginPath(); g.moveTo(350, 158); g.lineTo(374, 122); g.lineTo(392, 86); g.stroke();       // arm up with the mic
+      g.beginPath(); g.moveTo(290, 158); g.lineTo(262, 188); g.lineTo(244, 166); g.stroke();      // arm out
+      g.fillStyle = skin; g.beginPath(); g.arc(393, 82, 8, 0, Math.PI * 2); g.fill(); g.beginPath(); g.arc(242, 162, 8, 0, Math.PI * 2); g.fill();
+      g.fillStyle = COL.deep; g.fillRect(388, 58, 10, 20);
+      g.fillStyle = COL.chrome; g.beginPath(); g.arc(393, 56, 8, 0, Math.PI * 2); g.fill();
+    })(dancer.getContext("2d"));
+    function demoFrame(t) {
+      var g = demo.getContext("2d");
+      g.drawImage(stage, 0, 0);
+      g.drawImage(dancer, 0, still ? 0 : -Math.abs(Math.sin(t * 2.6)) * 8 * K);
+      return demo;
     }
-    function fallback() {
-      stopCam();
-      $("cam-idle").innerHTML = copy(c.fallbackLine);
-      $("cam-frame").classList.add("is-fallback");
+
+    // Draw the current picture into a rect, cover-fit. The camera is mirrored, like looking in a mirror.
+    function drawSource(g, t, dx, dy, dw, dh, zoom) {
+      var src, sw, sh, mirror = false;
+      if (live && video.readyState >= 2 && video.videoWidth) { src = video; sw = video.videoWidth; sh = video.videoHeight; mirror = true; }
+      else { src = demoFrame(t); sw = W; sh = H; }
+      var s = Math.max(dw / sw, dh / sh) * (zoom || 1), cw = dw / s, ch = dh / s;
+      g.save();
+      if (mirror) { g.translate(dx + dw, dy); g.scale(-1, 1); g.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, dw, dh); }
+      else g.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh);
+      g.restore();
+    }
+
+    // ----- effects -----
+    var scratch = makeCanvas(W, H), red = makeCanvas(W, H), cyan = makeCanvas(W, H), quad = makeCanvas(W / 2, H / 2);
+    var scan = makeCanvas(W, H), grain = [];
+    (function () {
+      var g = scan.getContext("2d");
+      g.fillStyle = "rgba(0, 0, 0, 0.22)";
+      for (var y = 0; y < H; y += 4) g.fillRect(0, y, W, 2);
+      for (var k = 0; k < 4; k++) {
+        var gc = makeCanvas(W / 2, H / 2), gg = gc.getContext("2d"), img = gg.createImageData(gc.width, gc.height);
+        for (var p = 0; p < img.data.length; p += 4) { var v = Math.random() * 255; img.data[p] = img.data[p + 1] = img.data[p + 2] = v; img.data[p + 3] = 255; }
+        gg.putImageData(img, 0, 0);
+        grain.push(gc);
+      }
+    })();
+    function heartPath(g, cx, cy, s) {
+      g.beginPath();
+      g.moveTo(cx, cy + s * 0.36);
+      g.bezierCurveTo(cx - s * 0.72, cy - s * 0.06, cx - s * 0.44, cy - s * 0.62, cx, cy - s * 0.28);
+      g.bezierCurveTo(cx + s * 0.44, cy - s * 0.62, cx + s * 0.72, cy - s * 0.06, cx, cy + s * 0.36);
+      g.closePath();
+    }
+    function caption(g, text, x, y, size) {
+      g.font = size + "px Shrikhand, Georgia, serif";
+      g.lineJoin = "round"; g.lineWidth = size * 0.22; g.strokeStyle = COL.deep; g.strokeText(text, x, y);
+      g.fillStyle = COL.fg; g.fillText(text, x, y);
+    }
+    var FX = {
+      // Light spots drift slowly across a dimmed picture. Nothing blinks.
+      mirrorball: function (t) {
+        drawSource(ctx, t, 0, 0, W, H);
+        ctx.fillStyle = "rgba(28, 7, 24, 0.35)"; ctx.fillRect(0, 0, W, H);
+        ctx.save(); ctx.globalCompositeOperation = "screen";
+        for (var i = 0; i < 18; i++) {
+          var a = t * 0.3 + i * (Math.PI * 2 / 18);
+          var x = W / 2 + Math.cos(a) * W * (0.2 + (i % 4) * 0.1), y = H * 0.12 + (0.5 + 0.5 * Math.sin(a * 1.3 + i)) * H * 0.78;
+          ctx.fillStyle = i % 4 === 0 ? COL.lights[(i / 4) % 3] : "rgba(247, 234, 211, 0.6)";
+          ctx.globalAlpha = i % 4 === 0 ? 0.45 : 1;
+          ctx.beginPath(); ctx.arc(x, y, (10 + (i % 3) * 7) * K, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+        ctx.fillStyle = COL.chrome; ctx.beginPath(); ctx.arc(W / 2, 0, 30 * K, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = COL.deep; ctx.lineWidth = 2 * K;
+        for (var g = -24; g <= 24; g += 8) { ctx.beginPath(); ctx.moveTo(W / 2 + g * K, 0); ctx.lineTo(W / 2 + g * K, 30 * K); ctx.stroke(); }
+      },
+      // Friday's sweetheart cam: heart frame, warm rose tint, "Slow Burn".
+      heart: function (t) {
+        var cx = W / 2, cy = H * 0.47, s = H * 0.86;
+        ctx.fillStyle = COL.bg; ctx.fillRect(0, 0, W, H);
+        ctx.save(); heartPath(ctx, cx, cy, s); ctx.clip();
+        drawSource(ctx, t, cx - s * 0.6, cy - s * 0.55, s * 1.2, s * 0.95);
+        ctx.globalCompositeOperation = "soft-light"; ctx.fillStyle = "rgba(255, 79, 168, 0.55)"; ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = "rgba(255, 150, 120, 0.12)"; ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+        heartPath(ctx, cx, cy, s); ctx.strokeStyle = COL.lights[1]; ctx.lineWidth = 6 * K; ctx.stroke();
+        caption(ctx, c.heartWords[0], 18 * K, H * 0.46, 34 * K);
+        caption(ctx, c.heartWords[1], 18 * K, H * 0.46 + 40 * K, 34 * K);
+      },
+      // The picture split and mirrored into four.
+      kaleido: function (t) {
+        var q = quad.getContext("2d");
+        drawSource(q, t, 0, 0, W / 2, H / 2, 1.2);
+        ctx.drawImage(quad, 0, 0);
+        ctx.save(); ctx.translate(W, 0); ctx.scale(-1, 1); ctx.drawImage(quad, 0, 0); ctx.restore();
+        ctx.save(); ctx.translate(0, H); ctx.scale(1, -1); ctx.drawImage(quad, 0, 0); ctx.restore();
+        ctx.save(); ctx.translate(W, H); ctx.scale(-1, -1); ctx.drawImage(quad, 0, 0); ctx.restore();
+        ctx.fillStyle = COL.chrome; ctx.fillRect(W / 2 - 2 * K, 0, 4 * K, H); ctx.fillRect(0, H / 2 - 2 * K, W, 4 * K);
+      },
+      // Old TV signal: color fringe, warm cast, scanlines and film grain (low contrast, never a flash).
+      broadcast: function (t) {
+        var s = scratch.getContext("2d");
+        drawSource(s, t, 0, 0, W, H);
+        [[red, "#ff0000"], [cyan, "#00ffff"]].forEach(function (pair) {
+          var g = pair[0].getContext("2d");
+          g.globalCompositeOperation = "source-over"; g.drawImage(scratch, 0, 0);
+          g.globalCompositeOperation = "multiply"; g.fillStyle = pair[1]; g.fillRect(0, 0, W, H);
+        });
+        ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(cyan, -3 * K, 0);
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.drawImage(red, 3 * K, 0); ctx.restore();
+        ctx.save();
+        ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = "#ffe2c2"; ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "overlay"; ctx.globalAlpha = 0.16;
+        ctx.drawImage(grain[still ? 0 : Math.floor(t * 8) % grain.length], 0, 0, W, H);
+        ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1; ctx.drawImage(scan, 0, 0);
+        ctx.restore();
+      },
+      // The picture on a grid of floor squares that brighten and fade slowly in the three light colors.
+      floor: function (t) {
+        var size = H / 9;
+        ctx.fillStyle = COL.deep; ctx.fillRect(0, 0, W, H);
+        for (var r = 0; r < 9; r++) {
+          for (var col = 0; col < Math.ceil(W / size); col++) {
+            var k = still ? ((col + r) % 3 === 0 ? 0.9 : 0.3) : 0.3 + 0.6 * (0.5 + 0.5 * Math.sin(t * 1.6 + col * 0.6 + r * 0.9));
+            ctx.globalAlpha = k; ctx.fillStyle = COL.lights[(col + r * 2) % 3];
+            ctx.fillRect(col * size + 2 * K, r * size + 2 * K, size - 4 * K, size - 4 * K);
+          }
+        }
+        ctx.globalAlpha = 1;
+        var iw = W * 0.6, ih = H * 0.6, ix = (W - iw) / 2, iy = H * 0.1;
+        ctx.fillStyle = COL.chrome; ctx.fillRect(ix - 6 * K, iy - 6 * K, iw + 12 * K, ih + 12 * K);
+        drawSource(ctx, t, ix, iy, iw, ih);
+      }
+    };
+
+    // ----- render loop: runs only while the section is on screen -----
+    function render(now) {
+      raf = null;
+      var t = still ? 0 : (now || performance.now()) / 1000;
+      ctx.save(); FX[fx](t); ctx.restore();
+      // A still demo only needs one frame; a camera or a moving effect needs every frame.
+      if (onScreen && !document.hidden && (live || !still)) raf = requestAnimationFrame(render);
+    }
+    function kick() { if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(render); }
+    function label() {
+      var name = byId(c.effects, fx).label;
+      cv.setAttribute("aria-label", (live ? c.who : c.demoWho) + ". " + name + ".");
+    }
+
+    // ----- lower third captions -----
+    function nextCaption() { $("cam-caption").textContent = c.captions[capIndex++ % c.captions.length]; }
+    nextCaption();
+    setInterval(function () { if (onScreen) nextCaption(); }, 3200);
+
+    // ----- effects buttons -----
+    Array.prototype.forEach.call(sec.querySelectorAll(".fx-btn"), function (b) {
+      b.addEventListener("click", function () {
+        fx = b.getAttribute("data-fx");
+        Array.prototype.forEach.call(sec.querySelectorAll(".fx-btn"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+        label(); kick();
+      });
+    });
+
+    // ----- camera -----
+    var on = $("cam-on"), off = $("cam-off");
+    function setLive(v) {
+      live = v;
+      $("cam-frame").classList.toggle("is-live", v);
+      $("cam-tally").textContent = v ? c.liveTally : c.demoTally;
+      $("cam-who").textContent = v ? c.who : c.demoWho;
+      on.hidden = v; off.hidden = !v; on.disabled = false;
+      label(); kick();
+    }
+    function stopCam(msg) {
+      if (stream) stream.getTracks().forEach(function (tr) { tr.stop(); });
+      stream = null;
+      video.pause(); video.srcObject = null;
+      if (live) setLive(false);
+      if (msg) status(msg);
     }
     on.addEventListener("click", function () {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { fallback(); return; }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { status(c.fallbackLine); return; }
       on.disabled = true;
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }).then(function (s) {
-        stream = s;
-        video.muted = true;
-        video.srcObject = s;
-        video.hidden = false;
-        var p = video.play();
-        if (p && p.catch) p.catch(function () {});
-        $("cam-frame").classList.remove("is-fallback");
-        $("cam-frame").classList.add("is-live");
-        $("cam-lower").hidden = false;
-        capIndex = 0; caption();
-        capTimer = setInterval(caption, 3200);
-        on.hidden = true; off.hidden = false; off.focus();
-      }).catch(fallback);
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
+        .then(function (s) {
+          stream = s;
+          video.muted = true;
+          video.srcObject = s;
+          var p = video.play();
+          if (p && p.catch) p.catch(function () {});
+          setLive(true);
+          status(c.liveLine);
+          off.focus();
+        })
+        .catch(function () { on.disabled = false; status(c.fallbackLine); });
     });
-    off.addEventListener("click", function () { stopCam(); on.focus(); });
-    window.addEventListener("pagehide", stopCam);
+    off.addEventListener("click", function () { stopCam(c.offLine); on.focus(); });
+    window.addEventListener("pagehide", function () { stopCam(); });
+    document.addEventListener("visibilitychange", kick);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        onScreen = en[0].isIntersecting;
+        if (onScreen) kick();
+        else if (stream) stopCam(c.awayLine);
+      }).observe(sec);
+    }
+
+    // ----- snapshot: a Polaroid-style card made in the browser -----
+    $("cam-snap").addEventListener("click", function () {
+      if (!raf) render();
+      var pad = 40, card = makeCanvas(W + pad * 2, H + pad + 170), g = card.getContext("2d");
+      g.fillStyle = COL.fg; g.fillRect(0, 0, card.width, card.height);
+      g.drawImage(cv, pad, pad);
+      g.save(); g.translate(pad + 8, H + pad + 105); g.rotate(-0.03);
+      g.font = "58px Shrikhand, Georgia, serif"; g.fillStyle = COL.bg; g.fillText(c.polaroidText, 0, 0);
+      g.restore();
+      card.toBlob(function (blob) {
+        if (!blob) return;
+        if (shotUrl) URL.revokeObjectURL(shotUrl);
+        shotUrl = URL.createObjectURL(blob);
+        $("cam-shot-img").src = shotUrl;
+        $("cam-save").href = shotUrl;
+        $("cam-shot").hidden = false;
+        status(c.snapLine);
+        $("cam-save").focus();
+      }, "image/png");
+    });
+    $("cam-shot-close").addEventListener("click", function () {
+      $("cam-shot").hidden = true;
+      if (shotUrl) { URL.revokeObjectURL(shotUrl); shotUrl = null; }
+      $("cam-snap").focus();
+    });
+
+    label();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(kick);
+    kick();
   }
 
   // ---------- confetti cannon ----------

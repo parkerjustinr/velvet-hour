@@ -211,27 +211,46 @@ main:focus { outline: none; }
 }
 @media (min-width: 1040px) { .sp-grid { grid-template-columns: repeat(6, 1fr); } }
 
-/* ---------- dance cam: jumbotron ---------- */
+/* ---------- dance cam: TV studio jumbotron ---------- */
 .cam { display: grid; gap: 20px; }
+.cam-intro { margin: 0; }
 .cam-frame { position: relative; aspect-ratio: 16 / 9; background: var(--bg-deep); border: 10px solid var(--chrome); outline: 2px solid var(--bg-deep); outline-offset: -12px; overflow: hidden; }
-.cam-still { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(4, 1fr); gap: 3px; padding: 3px; }
-.cam-still i { background: var(--bg); }
-.cam-still i.l1 { background: var(--track-1); }
-.cam-still i.l2 { background: var(--track-2); }
-.cam-still i.l3 { background: var(--track-3); }
-.cam-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: var(--bg-deep); }
-.cam-video[hidden] { display: none; }
-.cam-idle { position: absolute; left: 12px; right: 12px; bottom: 12px; margin: 0; justify-self: start; max-width: 32ch; background: var(--bg); padding: 6px 10px; font-weight: 700; font-size: clamp(0.85rem, 2.4vw, 1.1rem); line-height: 1.35; border-left: 4px solid var(--chrome); }
-.cam-frame.is-live .cam-idle { display: none; }
-.cam-lower { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--bg); border-top: var(--rule); font-weight: 800; font-size: clamp(1rem, 3.4vw, 1.4rem); animation: lower-in 400ms ease both; }
-.cam-lower[hidden] { display: none; }
-.cam-live { flex: none; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; background: var(--track-2); color: var(--on-track); }
-@keyframes lower-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.cam-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.cam-canvas { display: block; width: 100%; height: 100%; }
+/* The video only feeds the canvas. It stays in the page (iPhone Safari pauses display:none video) but out of sight. */
+.cam-video { position: absolute; left: 0; top: 0; width: 2px; height: 2px; opacity: 0; pointer-events: none; }
+.cam-bug { position: absolute; top: 8px; left: 8px; margin: 0; padding: 1px 10px 3px; background: var(--chrome); color: var(--bg); font-family: var(--display); font-size: clamp(0.72rem, 1.9vw, 1rem); text-transform: uppercase; letter-spacing: 0.03em; }
+.cam-tally { position: absolute; top: 8px; right: 8px; margin: 0; display: flex; align-items: center; gap: 7px; padding: 2px 10px; background: var(--bg); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.cam-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+/* Tally light: on and off once every 1.2 seconds, well under 3 flashes a second. Reduced motion holds it steady. */
+.cam-frame.is-live .cam-dot { background: var(--track-2); animation: tally 1.2s steps(1) infinite; }
+@keyframes tally { 50% { opacity: 0.2; } }
+.cam-lower { position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 12px 8px; background: var(--bg); border-top: var(--rule); }
+.cam-who { margin: 0; font-family: var(--display); font-size: clamp(0.95rem, 2.4vw, 1.4rem); line-height: 1.2; }
+.cam-caption { margin: 0; font-weight: 700; font-size: clamp(0.8rem, 1.8vw, 1rem); color: var(--muted); }
+.cam-fx { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 16px 0; }
+.fx-btn { appearance: none; min-height: 56px; padding: 10px 14px; border: var(--rule); background: var(--bg); color: var(--fg); font: inherit; font-weight: 800; font-size: 1.05rem; text-align: left; cursor: pointer; transition: background-color 120ms ease, color 120ms ease; }
+.fx-btn:hover { background: var(--bg-2); }
+.fx-btn:active { transform: translateY(1px); }
+.fx-btn[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); border-color: var(--gold); }
+.fx-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.cam-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
 .cam-controls .btn[hidden] { display: none; }
-.cam-privacy { font-size: 0.95rem; color: var(--muted); max-width: 46ch; }
-@media (min-width: 960px) {
-  .cam { grid-template-columns: 8fr 4fr; gap: 40px; align-items: end; }
+.cam-privacy { font-size: 0.95rem; color: var(--muted); max-width: 60ch; }
+.cam-status { font-weight: 700; margin: 0; }
+.cam-status:empty { display: none; }
+.cam-shot { margin-top: 8px; max-width: 460px; }
+.cam-shot[hidden] { display: none; }
+.polaroid { display: block; width: 100%; max-width: 440px; border: 2px solid var(--chrome); transform: rotate(-2deg); margin: 8px 0 24px; }
+.cam-shot-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+@media (min-width: 720px) {
+  .cam-fx { grid-template-columns: repeat(5, 1fr); }
+  .fx-btn:last-child:nth-child(odd) { grid-column: auto; }
+}
+@media (min-width: 1040px) {
+  .cam { grid-template-columns: 8fr 4fr; grid-template-areas: "main intro" "main shot"; grid-template-rows: auto 1fr; gap: 20px 40px; align-items: start; }
+  .cam-main { grid-area: main; }
+  .cam-intro { grid-area: intro; }
+  .cam-shot { grid-area: shot; }
 }
 
 /* ---------- confetti cannon ---------- */

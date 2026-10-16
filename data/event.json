@@ -178,12 +178,34 @@
 
   "dancecam": {
     "heading": "Dance Cam",
-    "intro": "On the night, the Dance Cam roams the floor and the balcony and puts you on the big screen. Try it here first.",
+    "intro": "On the night, the Dance Cam roams the floor and the balcony and puts you on the big screen. Try the broadcast here first: pick an effect, step on the floor, take a snapshot.",
+    "bug": "Velvet Hour Dance Cam",
+    "liveTally": "Live",
+    "demoTally": "Demo",
+    "who": "Now on the floor: You",
+    "demoWho": "Now on the floor: Demo dancer",
+    "effects": [
+      {"id": "mirrorball", "label": "Mirror Ball"},
+      {"id": "heart", "label": "Heart Cam"},
+      {"id": "kaleido", "label": "Kaleido"},
+      {"id": "broadcast", "label": "Broadcast"},
+      {"id": "floor", "label": "Floor Lights"}
+    ],
+    "heartWords": ["Slow", "Burn"],
     "onLabel": "Put me on the Dance Cam",
     "offLabel": "Turn off camera",
-    "privacy": "Nothing is recorded, saved or sent. Your picture only shows on this screen, and it stops when you turn the camera off or leave the page.",
-    "idleLine": "Your spot on the big screen",
-    "fallbackLine": "No camera today? No problem. The real Dance Cam will find you on the night.",
+    "snapLabel": "Take a snapshot",
+    "saveLabel": "Save to my device",
+    "closeLabel": "Close",
+    "snapAlt": "Your Dance Cam snapshot on a Polaroid-style card that reads Velvet Hour, Nov 2026",
+    "saveHint": "On iPhone, you can also press and hold the picture to save it.",
+    "polaroidText": "Velvet Hour, Nov 2026",
+    "privacy": "Nothing is recorded, uploaded or sent anywhere. The picture is made in your browser and stays on your device. A snapshot is only kept if you press Save, and it saves to your own device.",
+    "liveLine": "You're on the Dance Cam. The picture stays on this device.",
+    "offLine": "Camera off. The demo dancer is back on the floor.",
+    "awayLine": "Camera turned off when you scrolled away. Press the button to come back on.",
+    "fallbackLine": "No camera today? No problem. The demo dancer is on the floor, and every effect still works.",
+    "snapLine": "Snapshot ready. Save it to your device, or close it.",
     "captions": ["Show us your best move", "Front row energy", "Who taught you that?", "Velvet Hour, are you ready?", "Biggest smile in the building", "Now do it in slow motion", "Somebody get this dancer a spotlight"]
   },
 
@@ -204,7 +226,10 @@
       {"q": "Is it the same show both nights?", "a": "No. Friday is Slow Burn: ballads, a ballad duet with June Halloway, the Heart Cam and a slow dance under the mirror ball to close. Saturday is Full Funk: horns up front, a surprise guest, a Dance Cam dance-off, gold confetti cannons and an afterparty until 2 AM. Two setlists, and no song is played twice."},
       {"q": "Do I need a ticket for each night?", "a": "Yes, every single ticket is for one night. If you want both, the Both nights pass is Dance Floor on Friday and Saturday for $150, which is $20 less than two singles."},
       {"q": "How does the front rail lottery work?", "a": "Every Dance Floor ticket gets one draw for its night, and the Both nights pass gets one draw each night. Scan in by 6:55 PM and you are entered automatically. The draw happens at 7:00 PM; winners get a text and a rail wristband and head to the front before the opener. Friday's draw does not carry over, so Saturday is a fresh chance."},
-      {"q": "Does the Dance Cam record anything?", "a": "No. The Dance Cam and Friday's Heart Cam are live feeds to the big screen and nothing else. Nothing is recorded, saved or streamed. If you would rather not be on screen, cross your arms in an X and the operator moves on."},
+      {
+        "q": "Does the Dance Cam record anything?",
+        "a": "No. At the show, the Dance Cam and Friday's Heart Cam are live feeds to the big screen and nothing else: nothing is recorded, saved or streamed. If you would rather not be on screen, cross your arms in an X and the operator moves on. The Dance Cam tryout on this site runs entirely in your browser. Your camera picture never leaves your device, and a snapshot is only kept if you press Save, which saves it to your own device."
+      },
       {"q": "When should I get there?", "a": "Doors are at 6:30 PM both nights and the crowd cam warm-up starts at 7:15 PM. Rio Delacroix is on stage around 9:30 PM. Front Rail and Soundcheck VIP can come in from 6:00 PM."},
       {"q": "Will I get confetti in the balcony?", "a": "On Saturday, yes. The gold confetti cannons are aimed at the whole room, balcony included. Friday ends with a slow dance under the mirror ball instead."},
       {"q": "Is there a dress code?", "a": "No. Velvet for Friday, sequins and platforms for Saturday, if you want a theme. Both catch the Dance Cam's eye."},
