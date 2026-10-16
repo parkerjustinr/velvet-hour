@@ -12,9 +12,9 @@
   --muted: #55535a;
   --accent: #d2452a;       /* primary action, selected ticket */
   --on-accent: #ffffff;
-  --track-1: #2a4fb8;      /* Main Stage */
-  --track-2: #d2452a;      /* Studio */
-  --track-3: #e0a92e;      /* Social */
+  --track-1: #2a4fb8;      /* Stage */
+  --track-2: #d2452a;      /* Dance floor */
+  --track-3: #e0a92e;      /* Lounge */
   --focus: #2a4fb8;
 
   /* Type: one display face with character, one clean body face */

@@ -1,102 +1,123 @@
 {
   "meta": {
-    "name": "Sample Event",
-    "shortName": "SE",
+    "name": "Velvet Hour",
+    "shortName": "VH",
     "year": "2026",
-    "tagline": "[PLACEHOLDER] One line that says what this event is and who it is for.",
+    "tagline": "A live-band soul and funk revue built to get the whole room dancing.",
     "timezone": "America/New_York",
     "tzLabel": "ET",
-    "dates": "Sat, Nov 14 - Sun, Nov 15, 2026",
-    "venue": "Sample Venue",
-    "city": "City, ST",
-    "address": "123 Sample St, City, ST 00000",
-    "pageTitle": "Sample Event 2026 - City, ST",
-    "description": "[PLACEHOLDER] Meta description: what, when, where, in one sentence.",
-    "placeholderNotice": "Sample content. Every name, time, and price on this page is placeholder.",
-    "footerLine": "Event site concept built on Arrived."
+    "dates": "Fri, Nov 20 - Sat, Nov 21, 2026",
+    "venue": "The Anthem",
+    "city": "Washington, DC",
+    "address": "901 Wharf St SW, Washington, DC 20024",
+    "pageTitle": "Velvet Hour 2026 - The Anthem, Washington, DC",
+    "description": "Velvet Hour: a two-night live-band soul and funk revue at The Anthem, Washington, DC, Nov 20 and 21, 2026.",
+    "placeholderNotice": "Fictional event. Every performer, song, time and price on this page is invented.",
+    "footerLine": "Fictional event made for the Happily Design Jam."
   },
 
   "sections": [
     { "id": "about", "label": "About", "on": true },
-    { "id": "speakers", "label": "Speakers", "on": true },
-    { "id": "schedule", "label": "Schedule", "on": true },
+    { "id": "speakers", "label": "Lineup", "on": true },
+    { "id": "schedule", "label": "Run of show", "on": true },
     { "id": "tickets", "label": "Tickets", "on": true },
-    { "id": "sponsors", "label": "Sponsors", "on": true },
+    { "id": "sponsors", "label": "Sponsors", "on": false },
     { "id": "venue", "label": "Getting there", "on": true },
     { "id": "register", "label": "Register", "on": true },
     { "id": "faq", "label": "FAQ", "on": true }
   ],
 
   "hero": {
-    "title": ["Sample", "Event"],
-    "sub": "[PLACEHOLDER] Two sentences max. What happens, who should come, why this year.",
+    "title": ["Velvet", "Hour"],
+    "sub": "A live-band soul and funk revue built to get the whole room dancing. Two nights at The Anthem, a twelve-piece band, and a show where the crowd is part of the act.",
     "primaryCta": { "label": "Get tickets", "href": "#tickets" },
-    "secondaryCta": { "label": "See the schedule", "href": "#schedule" },
+    "secondaryCta": { "label": "See the run of show", "href": "#schedule" },
     "facts": [
-      { "value": "2", "label": "Days" },
-      { "value": "24", "label": "Sessions" },
-      { "value": "12", "label": "Speakers" },
-      { "value": "600", "label": "Seats" }
+      { "value": "2", "label": "Nights" },
+      { "value": "4", "label": "Scenes a night" },
+      { "value": "12", "label": "Players on stage" },
+      { "value": "16", "label": "Confetti cannons" }
     ]
   },
 
   "about": {
-    "heading": "[PLACEHOLDER] About heading that says something specific",
+    "heading": "Two hours where the crowd is part of the show",
     "paragraphs": [
-      "[PLACEHOLDER] First paragraph. The one thing that makes this event different.",
-      "[PLACEHOLDER] Second paragraph. What a first-timer should expect."
+      "Rio Delacroix does not let up. From the first horn hit to the last encore, every song is one you know by the second chorus, and every set change turns the stage into a new scene: the velvet rope, the funk breakdown, the slow jam, the mirror ball.",
+      "June Halloway opens the night, then comes back mid-set for a duet. The Dance Cam roams the floor and the balcony and puts you on the big screen. The finale sends confetti over the whole room, not just the front rows. Come ready to dance; you will not be watching from the outside."
     ]
   },
 
   "tracks": [
-    { "id": "main", "name": "Main Stage" },
-    { "id": "studio", "name": "Studio" },
-    { "id": "social", "name": "Social" }
+    { "id": "stage", "name": "Stage" },
+    { "id": "floor", "name": "Dance floor" },
+    { "id": "lounge", "name": "Lounge" }
   ],
 
   "speakers": {
-    "heading": "Speakers",
-    "intro": "[PLACEHOLDER] One line on who is speaking and why it matters.",
+    "heading": "Lineup",
+    "intro": "One headliner, one opener who comes back for more, a band built for stamina, and two DJs to keep the floor warm.",
+    "linksLabel": "Set times",
     "items": [
-      { "id": "sp1", "name": "Speaker One", "role": "Title, Organization", "bio": "[PLACEHOLDER] Two-line bio for the featured speaker. This person gets the big slot.", "photo": "", "link": "" },
-      { "id": "sp2", "name": "Speaker Two", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
-      { "id": "sp3", "name": "Speaker Three", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
-      { "id": "sp4", "name": "Speaker Four", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
-      { "id": "sp5", "name": "Speaker Five", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
-      { "id": "sp6", "name": "Speaker Six", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" }
+      { "id": "rio", "name": "Rio Delacroix", "role": "Headliner", "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.", "photo": "", "link": "" },
+      { "id": "june", "name": "June Halloway", "role": "Opener, and the mid-set duet", "bio": "", "photo": "", "link": "" },
+      { "id": "theo", "name": "Theo Okafor", "role": "Band leader and keys, The Chrome Section", "bio": "", "photo": "", "link": "" },
+      { "id": "brass", "name": "The Brass Satellites", "role": "Horn section: two trumpets, tenor sax, trombone", "bio": "", "photo": "", "link": "" },
+      { "id": "polyester", "name": "DJ Polyester", "role": "DJ, Night 1 and the Friday afterparty", "bio": "", "photo": "", "link": "" },
+      { "id": "lavalamp", "name": "DJ Lava Lamp", "role": "DJ, Night 2 and the Saturday afterparty", "bio": "", "photo": "", "link": "" },
+      { "id": "bobbie", "name": "Bobbie Dazzle", "role": "Host and Dance Cam ringleader", "bio": "", "photo": "", "link": "" }
     ]
   },
 
   "schedule": {
-    "heading": "Schedule",
-    "note": "[PLACEHOLDER] Times are draft.",
+    "heading": "Run of show",
+    "note": "Set times are a guide. When the room asks for one more, the band plays one more.",
     "days": [
       {
-        "id": "d1",
-        "label": "Day 1",
-        "date": "2026-11-14",
-        "title": "Saturday, Nov 14",
+        "id": "n1",
+        "label": "Night 1",
+        "date": "2026-11-20",
+        "title": "Friday, Nov 20",
         "sessions": [
-          { "id": "s101", "start": "09:00", "end": "10:00", "title": "Doors and check-in", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Badge pickup at the front desk.", "tiers": ["full", "day1", "vip"] },
-          { "id": "s102", "start": "10:00", "end": "10:45", "title": "Opening keynote", "track": "main", "speakers": ["sp1"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
-          { "id": "s103", "start": "11:00", "end": "12:00", "title": "Panel session", "track": "main", "speakers": ["sp2", "sp3"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
-          { "id": "s104", "start": "11:00", "end": "12:30", "title": "Hands-on workshop", "track": "studio", "speakers": ["sp4"], "detail": "[PLACEHOLDER] Limited seats.", "tiers": ["full", "vip"] },
-          { "id": "s105", "start": "12:30", "end": "13:30", "title": "Lunch", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Included with Full and VIP.", "tiers": ["full", "vip"] },
-          { "id": "s106", "start": "14:00", "end": "15:00", "title": "Fireside chat", "track": "main", "speakers": ["sp5"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
-          { "id": "s107", "start": "18:00", "end": "20:00", "title": "Speaker dinner", "track": "social", "speakers": ["sp1", "sp6"], "detail": "[PLACEHOLDER] VIP only.", "tiers": ["vip"] }
+          { "id": "n1-sound", "start": "17:00", "end": "17:45", "title": "Soundcheck and band Q&A", "track": "stage", "speakers": ["theo", "brass"], "detail": "Watch the band tune up the show, then ask them anything.", "tiers": ["vip"] },
+          { "id": "n1-early", "start": "18:00", "end": "18:30", "title": "Early entry", "track": "lounge", "speakers": [], "detail": "In before the doors open. Front Rail heads straight to the rail.", "tiers": ["rail", "vip"] },
+          { "id": "n1-doors", "start": "18:30", "end": "19:00", "title": "Doors", "track": "lounge", "speakers": [], "detail": "Bars and merch open.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-draw", "start": "19:00", "end": "19:15", "title": "Front rail lottery draw", "track": "floor", "speakers": ["bobbie"], "detail": "Every Dance Floor ticket scanned by 6:55 PM is in. Winners get a text and a rail wristband.", "tiers": ["floor"] },
+          { "id": "n1-cam", "start": "19:15", "end": "19:45", "title": "Crowd cam warm-up", "track": "floor", "speakers": ["bobbie"], "detail": "The Dance Cam goes live. Best moves on the floor and in the balcony make the big screen.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-dj", "start": "19:45", "end": "20:30", "title": "DJ set", "track": "floor", "speakers": ["polyester"], "detail": "Disco edits and deep funk to get the floor moving.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-open", "start": "20:30", "end": "21:10", "title": "Opener: June Halloway", "track": "stage", "speakers": ["june"], "detail": "Forty minutes of new soul.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-s1", "start": "21:30", "end": "21:50", "title": "Scene: The Velvet Rope", "track": "stage", "speakers": ["rio", "theo"], "detail": "The curtain drops and the revue opens with \"Velvet Ultimatum\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-s2", "start": "21:50", "end": "22:10", "title": "Scene: The Funk Breakdown", "track": "stage", "speakers": ["rio", "theo", "brass"], "detail": "The horns come down front for \"Chrome Heart Shuffle\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-duet", "start": "22:10", "end": "22:20", "title": "Duet: June Halloway returns", "track": "stage", "speakers": ["rio", "june"], "detail": "The opener is back for \"Penny for the Jukebox\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-s3", "start": "22:20", "end": "22:40", "title": "Scene: The Slow Jam", "track": "stage", "speakers": ["rio"], "detail": "Lights down, phones up, \"Slow Dance at the Roller Rink\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-s4", "start": "22:40", "end": "22:55", "title": "Scene: The Mirror Ball", "track": "stage", "speakers": ["rio"], "detail": "The light-up floor takes over and the whole room dances.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-confetti", "start": "22:55", "end": "23:05", "title": "Confetti finale", "track": "stage", "speakers": ["rio"], "detail": "Sixteen cannons, aimed at the whole room, balcony included.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-encore", "start": "23:10", "end": "23:25", "title": "Encore", "track": "stage", "speakers": ["rio", "theo"], "detail": "Different every night.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n1-after", "start": "23:45", "end": "01:30", "title": "Afterparty", "track": "lounge", "speakers": ["polyester"], "detail": "Upstairs lounge, one more DJ set.", "tiers": ["vip"] }
         ]
       },
       {
-        "id": "d2",
-        "label": "Day 2",
-        "date": "2026-11-15",
-        "title": "Sunday, Nov 15",
+        "id": "n2",
+        "label": "Night 2",
+        "date": "2026-11-21",
+        "title": "Saturday, Nov 21",
         "sessions": [
-          { "id": "s201", "start": "09:30", "end": "10:00", "title": "Doors", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Coffee in the lobby.", "tiers": ["full", "day2", "vip"] },
-          { "id": "s202", "start": "10:00", "end": "11:00", "title": "Morning keynote", "track": "main", "speakers": ["sp6"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day2", "vip"] },
-          { "id": "s203", "start": "11:15", "end": "12:30", "title": "Studio session", "track": "studio", "speakers": ["sp3", "sp4"], "detail": "[PLACEHOLDER] Limited seats.", "tiers": ["full", "vip"] },
-          { "id": "s204", "start": "13:30", "end": "14:30", "title": "Closing talk", "track": "main", "speakers": ["sp2"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day2", "vip"] },
-          { "id": "s205", "start": "15:00", "end": "17:00", "title": "Closing party", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Everyone welcome.", "tiers": ["full", "day2", "vip"] }
+          { "id": "n2-sound", "start": "17:00", "end": "17:45", "title": "Soundcheck and band Q&A", "track": "stage", "speakers": ["theo", "brass"], "detail": "Watch the band tune up the show, then ask them anything.", "tiers": ["vip"] },
+          { "id": "n2-early", "start": "18:00", "end": "18:30", "title": "Early entry", "track": "lounge", "speakers": [], "detail": "In before the doors open. Front Rail heads straight to the rail.", "tiers": ["rail", "vip"] },
+          { "id": "n2-doors", "start": "18:30", "end": "19:00", "title": "Doors", "track": "lounge", "speakers": [], "detail": "Bars and merch open.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-draw", "start": "19:00", "end": "19:15", "title": "Front rail lottery draw", "track": "floor", "speakers": ["bobbie"], "detail": "A fresh draw. Friday's result does not carry over, so everyone gets a second chance.", "tiers": ["floor"] },
+          { "id": "n2-cam", "start": "19:15", "end": "19:45", "title": "Crowd cam warm-up", "track": "floor", "speakers": ["bobbie"], "detail": "The Dance Cam goes live. Best moves on the floor and in the balcony make the big screen.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-dj", "start": "19:45", "end": "20:30", "title": "DJ set", "track": "floor", "speakers": ["lavalamp"], "detail": "Boogie, roller-rink soul and a few surprises.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-open", "start": "20:30", "end": "21:10", "title": "Opener: June Halloway", "track": "stage", "speakers": ["june"], "detail": "Forty minutes of new soul.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-s1", "start": "21:30", "end": "21:50", "title": "Scene: The Velvet Rope", "track": "stage", "speakers": ["rio", "theo"], "detail": "The curtain drops and the revue opens with \"Velvet Ultimatum\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-s2", "start": "21:50", "end": "22:10", "title": "Scene: The Funk Breakdown", "track": "stage", "speakers": ["rio", "theo", "brass"], "detail": "The horns come down front for \"Chrome Heart Shuffle\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-duet", "start": "22:10", "end": "22:20", "title": "Duet: June Halloway returns", "track": "stage", "speakers": ["rio", "june"], "detail": "The opener is back for \"Penny for the Jukebox\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-s3", "start": "22:20", "end": "22:40", "title": "Scene: The Slow Jam", "track": "stage", "speakers": ["rio"], "detail": "Lights down, phones up, \"Slow Dance at the Roller Rink\".", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-guest", "start": "22:40", "end": "22:50", "title": "Surprise guest", "track": "stage", "speakers": [], "detail": "Night 2 only. One name we are not printing.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-s4", "start": "22:50", "end": "23:05", "title": "Scene: The Mirror Ball", "track": "stage", "speakers": ["rio"], "detail": "The light-up floor takes over and the whole room dances.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-confetti", "start": "23:05", "end": "23:15", "title": "Confetti finale", "track": "stage", "speakers": ["rio"], "detail": "Sixteen cannons, aimed at the whole room, balcony included.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-encore", "start": "23:20", "end": "23:35", "title": "Encore", "track": "stage", "speakers": ["rio", "theo"], "detail": "Different every night.", "tiers": ["balcony", "floor", "rail", "vip"] },
+          { "id": "n2-after", "start": "23:55", "end": "02:00", "title": "Afterparty", "track": "lounge", "speakers": ["lavalamp"], "detail": "Upstairs lounge, last dance of the weekend.", "tiers": ["vip"] }
         ]
       }
     ]
@@ -104,64 +125,69 @@
 
   "tickets": {
     "heading": "Tickets",
-    "intro": "[PLACEHOLDER] One line. Pick a column to choose a ticket. Hover or tap a row to see exactly what it covers.",
-    "recommended": "full",
+    "intro": "Every ticket covers both nights. Pick a column to choose a ticket. Hover or tap a row to see exactly what it covers.",
+    "recommended": "floor",
+    "perDayLabel": "Per night",
     "tiers": [
-      { "id": "day1", "name": "Day 1", "price": "$45", "note": "Sat only", "days": 1 },
-      { "id": "day2", "name": "Day 2", "price": "$45", "note": "Sun only", "days": 1 },
-      { "id": "full", "name": "Full pass", "price": "$80", "note": "Both days", "days": 2 },
-      { "id": "vip", "name": "VIP", "price": "$150", "note": "Both days, plus", "days": 2 }
+      { "id": "balcony", "name": "Balcony", "price": "$140", "note": "Both nights, seated", "days": 2 },
+      { "id": "floor", "name": "Dance Floor", "price": "$160", "note": "Both nights, standing", "days": 2 },
+      { "id": "rail", "name": "Front Rail", "price": "$280", "note": "Both nights, at the rail", "days": 2 },
+      { "id": "vip", "name": "Soundcheck VIP", "price": "$480", "note": "Both nights, plus", "days": 2 }
     ],
     "rows": [
-      { "id": "r-d1", "group": "Access", "label": "Day 1 sessions", "from": "day:d1", "tiers": { "day1": "yes", "day2": "no", "full": "yes", "vip": "yes" } },
-      { "id": "r-d2", "group": "Access", "label": "Day 2 sessions", "from": "day:d2", "tiers": { "day1": "no", "day2": "yes", "full": "yes", "vip": "yes" } },
-      { "id": "r-ws", "group": "Access", "label": "Workshops and studio", "from": "track:studio", "tiers": { "day1": "no", "day2": "no", "full": "yes", "vip": "yes" } },
-      { "id": "r-lunch", "group": "Extras", "label": "Lunch", "detail": "[PLACEHOLDER] Lunch both days in the main hall.", "tiers": { "day1": "no", "day2": "no", "full": "yes", "vip": "yes" } },
-      { "id": "r-dinner", "group": "Extras", "label": "Speaker dinner", "from": "session:s107", "tiers": { "day1": "no", "day2": "no", "full": "no", "vip": "yes" } },
-      { "id": "r-seat", "group": "Extras", "label": "Reserved seating", "detail": "[PLACEHOLDER] First three rows at every Main Stage session.", "tiers": { "day1": "no", "day2": "no", "full": "no", "vip": "Front rows" } }
+      { "id": "r-floor", "group": "On the night", "label": "Dance floor access", "from": "track:floor", "tiers": { "balcony": "no", "floor": "yes", "rail": "yes", "vip": "yes" } },
+      { "id": "r-seat", "group": "On the night", "label": "Reserved seat", "detail": "[PLACEHOLDER] A numbered balcony seat, the same seat both nights. Soundcheck VIP gets a balcony box seat on top of floor access.", "tiers": { "balcony": "yes", "floor": "no", "rail": "no", "vip": "Box seat" } },
+      { "id": "r-lottery", "group": "On the night", "label": "Front rail lottery entry", "from": "session:n1-draw,session:n2-draw", "tiers": { "balcony": "no", "floor": "1 draw a night", "rail": "no", "vip": "no" } },
+      { "id": "r-rail", "group": "On the night", "label": "Guaranteed front rail", "detail": "A spot at the rail both nights, held until the Velvet Rope scene starts.", "tiers": { "balcony": "no", "floor": "no", "rail": "yes", "vip": "yes" } },
+      { "id": "r-early", "group": "On the night", "label": "Early entry", "from": "session:n1-early,session:n2-early", "tiers": { "balcony": "no", "floor": "no", "rail": "yes", "vip": "yes" } },
+      { "id": "r-sound", "group": "Extras", "label": "Soundcheck and band Q&A", "from": "session:n1-sound,session:n2-sound", "tiers": { "balcony": "no", "floor": "no", "rail": "no", "vip": "yes" } },
+      { "id": "r-after", "group": "Extras", "label": "Afterparty", "from": "session:n1-after,session:n2-after", "tiers": { "balcony": "no", "floor": "no", "rail": "no", "vip": "yes" } },
+      { "id": "r-merch", "group": "Extras", "label": "Merch", "detail": "Picked up at the merch desk either night. Front Rail gets the tour tee. Soundcheck VIP gets the tee and a numbered screen-printed poster.", "tiers": { "balcony": "no", "floor": "no", "rail": "Tee", "vip": "Tee and poster" } }
     ],
-    "footnote": "[PLACEHOLDER] Prices include fees. Refunds until 7 days before."
+    "footnote": "[PLACEHOLDER] Prices include fees. Tickets can be transferred until 48 hours before Night 1."
   },
 
   "sponsors": {
     "heading": "Sponsors",
-    "tiers": [
-      { "name": "Presented by", "items": [{ "name": "Sponsor One", "logo": "", "link": "" }] },
-      { "name": "Partners", "items": [{ "name": "Sponsor Two", "logo": "", "link": "" }, { "name": "Sponsor Three", "logo": "", "link": "" }, { "name": "Sponsor Four", "logo": "", "link": "" }] }
-    ]
+    "tiers": []
   },
 
   "venue": {
     "heading": "Getting there",
-    "intro": "[PLACEHOLDER] One line on the venue and the best way to arrive.",
-    "mapLink": "",
+    "intro": "The Anthem sits on The Wharf in Southwest DC. Metro is the easiest way in; plan your ride home before the encore.",
+    "mapLink": "https://www.google.com/maps/search/?api=1&query=The+Anthem+901+Wharf+St+SW+Washington+DC",
     "items": [
-      { "title": "Address", "body": "[PLACEHOLDER] 123 Sample St, City, ST 00000." },
-      { "title": "Transit", "body": "[PLACEHOLDER] Nearest station and walk time." },
-      { "title": "Parking", "body": "[PLACEHOLDER] Where, and what it costs." },
-      { "title": "Check-in", "body": "[PLACEHOLDER] Where to go first and what to bring." },
-      { "title": "Accessibility", "body": "[PLACEHOLDER] Step-free access, seating, and who to contact." }
+      { "title": "Address", "body": "[PLACEHOLDER] The Anthem, 901 Wharf St SW, Washington, DC 20024." },
+      { "title": "Metro", "body": "[PLACEHOLDER] Green Line to Waterfront station, then about a 10 minute walk to The Wharf. L'Enfant Plaza serves more lines and is a slightly longer walk. Check the last train time before you stay for the afterparty." },
+      { "title": "Rideshare", "body": "[PLACEHOLDER] Use the marked drop-off and pickup zone on Maine Ave SW. After the show, walk to the zone before you book; the streets right outside the doors back up fast." },
+      { "title": "Bag policy", "body": "[PLACEHOLDER] Clear bags or a small clutch only. No backpacks. Every bag is checked at the door." },
+      { "title": "ID", "body": "[PLACEHOLDER] Bring a photo ID. You need it for a drinks wristband, and Front Rail and Soundcheck VIP check-in matches the ID to the name on the ticket." },
+      { "title": "Accessibility", "body": "[PLACEHOLDER] Step-free entry, accessible balcony seating and a raised viewing platform beside the dance floor. Contact the box office before the show to arrange a spot or a companion seat." }
     ]
   },
 
   "registration": {
     "heading": "Register",
-    "intro": "[PLACEHOLDER] One line.",
+    "intro": "Pick your ticket and hold your spot for both nights.",
     "demoNotice": "Demo form. Nothing is sent anywhere.",
     "extraFields": [
-      { "id": "org", "label": "Company or school", "type": "text", "required": false },
-      { "id": "access", "label": "Access needs", "type": "textarea", "required": false, "hint": "Anything we should plan for." }
+      { "id": "request", "label": "A song you want the DJ to play", "type": "text", "required": false },
+      { "id": "access", "label": "Access needs", "type": "textarea", "required": false, "hint": "Seating, step-free routes, a companion ticket, anything we should plan for." }
     ],
-    "confirmation": "[PLACEHOLDER] What happens next: confirmation email, where to check in."
+    "confirmation": "[PLACEHOLDER] Your tickets arrive by email two weeks before Night 1. Bring the QR code and a photo ID. Dance Floor holders are entered in each night's front rail draw when they scan in."
   },
 
   "faq": {
     "heading": "FAQ",
     "items": [
-      { "q": "[PLACEHOLDER] Can I transfer my ticket?", "a": "[PLACEHOLDER] Answer." },
-      { "q": "[PLACEHOLDER] Is there a dress code?", "a": "[PLACEHOLDER] Answer." },
-      { "q": "[PLACEHOLDER] Will sessions be recorded?", "a": "[PLACEHOLDER] Answer." },
-      { "q": "[PLACEHOLDER] What is the refund policy?", "a": "[PLACEHOLDER] Answer." }
+      { "q": "How does the front rail lottery work?", "a": "Every Dance Floor ticket gets one draw per night. Scan in by 6:55 PM and you are entered automatically. The draw happens at 7:00 PM; winners get a text and a rail wristband and head to the front before the opener. Friday's draw does not carry over, so Saturday is a fresh chance." },
+      { "q": "Does the Dance Cam record anything?", "a": "No. The Dance Cam is a live feed to the big screen and nothing else. It is not recorded, saved or streamed. If you would rather not be on screen, cross your arms in an X and the operator moves on." },
+      { "q": "Do I need a ticket for each night?", "a": "No. Every ticket covers both Friday and Saturday. Night 2 has a different DJ and one surprise guest slot, so it is worth coming back." },
+      { "q": "When should I get there?", "a": "Doors are at 6:30 PM and the Dance Cam warm-up starts at 7:15 PM. Rio Delacroix is on stage around 9:30 PM. Front Rail and Soundcheck VIP can come in from 6:00 PM." },
+      { "q": "Will I get confetti in the balcony?", "a": "Yes. The finale cannons are aimed at the whole room, balcony included." },
+      { "q": "Is there a dress code?", "a": "No. Velvet, sequins, platforms and gold are all welcome, and they do tend to catch the Dance Cam's eye." },
+      { "q": "Can I bring a bag or a camera?", "a": "[PLACEHOLDER] Clear bags and small clutches only. Phones are fine. Professional cameras with detachable lenses are not. See Getting there for the full bag policy." },
+      { "q": "Is there an age limit?", "a": "[PLACEHOLDER] All ages. Under 16s need to be with an adult. You need to be 21 with ID to buy alcohol." }
     ]
   }
 }

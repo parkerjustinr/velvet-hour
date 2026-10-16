@@ -47,8 +47,13 @@
       return part ? part.value : tz;
     } catch (e) { return tz; }
   }
+  // "2026-11-20" -> "2026-11-21", for sessions that end after midnight.
+  function nextDate(dateStr) {
+    var d = dateStr.split("-");
+    return new Date(Date.UTC(+d[0], +d[1] - 1, +d[2] + 1)).toISOString().slice(0, 10);
+  }
   function sessionTimes(day, s) {
-    var a = zoned(day.date, s.start), b = zoned(day.date, s.end);
+    var a = zoned(day.date, s.start), b = zoned(s.end <= s.start ? nextDate(day.date) : day.date, s.end);
     return { start: a, end: b, label: fmtTime(a) + " - " + fmtTime(b) };
   }
 
@@ -123,7 +128,7 @@
     function sessionLinks(id) {
       var list = map[id] || [];
       if (!list.length) return "";
-      return '<ul class="sp-sessions" aria-label="Sessions">' + list.map(function (x) {
+      return '<ul class="sp-sessions" aria-label="' + esc(sp.linksLabel || "Sessions") + '">' + list.map(function (x) {
         var t = sessionTimes(x.day, x.s);
         return '<li><a href="#session-' + x.s.id + '"><span class="t" data-start="' + x.day.id + "|" + x.s.id + '">' + esc(x.day.label) + ", " + esc(fmtTime(t.start)) + "</span> " + esc(x.s.title) + "</a></li>";
       }).join("") + "</ul>";
@@ -188,10 +193,14 @@
 
   function rowPreviewItems(row) {
     if (!row.from) return null;
-    var parts = row.from.split(":"), kind = parts[0], key = parts[1], out = [];
+    // "from" takes one ref or several, comma separated: "session:a,session:b".
+    var refs = row.from.split(",").map(function (r) { var p = r.trim().split(":"); return { kind: p[0], key: p[1] }; }), out = [];
     D.schedule.days.forEach(function (day) {
       day.sessions.forEach(function (s) {
-        if ((kind === "day" && day.id === key) || (kind === "track" && s.track === key) || (kind === "session" && s.id === key)) out.push({ day: day, s: s });
+        var hit = refs.some(function (r) {
+          return (r.kind === "day" && day.id === r.key) || (r.kind === "track" && s.track === r.key) || (r.kind === "session" && s.id === r.key);
+        });
+        if (hit) out.push({ day: day, s: s });
       });
     });
     return out;
@@ -237,7 +246,7 @@
     });
     var nums = t.tiers.map(function (x) { return priceNum(x.price); });
     var perDay = nums.every(function (n, i) { return n !== null && t.tiers[i].days; })
-      ? '<tfoot><tr><th scope="row">Cost per day</th>' + t.tiers.map(function (tier, i) {
+      ? '<tfoot><tr><th scope="row">' + esc(t.perDayLabel || "Cost per day") + "</th>" + t.tiers.map(function (tier, i) {
           return '<td class="c-' + tier.id + '" data-tier="' + esc(tier.name) + '">$' + Math.round(nums[i] / tier.days) + "</td>";
         }).join("") + "</tr></tfoot>" : "";
     var table = '<table class="matrix" id="matrix" style="--tiers:' + t.tiers.length + '"><caption class="sr">What each ticket includes</caption>' + head + "<tbody>" + body + "</tbody>" + perDay + "</table>";

@@ -7,7 +7,9 @@ One-page event site. Plain HTML, CSS, vanilla JS. No framework, no build step. D
   - `sections` sets order and on/off for every section. Nav and footer follow it.
   - `tracks` drive schedule colors (track-1, track-2, track-3 in CSS, in the order listed).
   - Schedule sessions carry `tiers`, which the ticket matrix and calendar downloads use.
-  - Ticket rows with `from` (`day:<id>`, `track:<id>`, `session:<id>`) build their preview from the schedule. Rows without `from` show `detail`.
+  - Ticket rows with `from` (`day:<id>`, `track:<id>`, `session:<id>`) build their preview (several refs allowed, comma separated: `session:a,session:b`) from the schedule. Rows without `from` show `detail`.
+  - Sessions whose `end` is earlier than `start` end the next morning (afterparties).
+  - `tickets.perDayLabel` sets the computed price-per-day row label.
   - `[PLACEHOLDER]` in any string shows a visible Placeholder tag.
 - `styles.css` - design tokens at the top of `:root`. Change tokens first, then section styles.
 - `app.js` - one renderer per section in the `R` object. To add a section: add a renderer `R.<id>`, then add `{ "id": "<id>", "label": "...", "on": true }` to `sections`.
