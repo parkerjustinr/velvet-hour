@@ -517,9 +517,13 @@ html:has(dialog[open]) { overflow: hidden; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .tonearm { position: absolute; top: -4px; right: 2px; width: 6px; height: 64%; background: var(--chrome); transform-origin: top center; transform: rotate(-26deg); transition: transform 400ms ease; }
 .player.is-playing .tonearm { transform: rotate(-6deg); }
-.player-track { appearance: none; display: block; width: 100%; padding: 6px 0; border: 0; border-top: var(--hair); background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
-.player-track:hover { text-decoration: underline; }
-.player-track[aria-pressed="true"] { color: var(--gold); font-weight: 800; }
+.player-title { margin: 0 0 8px; font-family: var(--display); font-size: 1.3rem; line-height: 1.2; }
+.player-time { display: flex; align-items: center; gap: 10px; }
+.player-progress { flex: 1; min-width: 0; height: 6px; appearance: none; -webkit-appearance: none; border: 0; background: var(--bg); color: var(--fg); }
+.player-progress::-webkit-progress-bar { background: var(--bg); }
+.player-progress::-webkit-progress-value { background: var(--fg); }
+.player-progress::-moz-progress-bar { background: var(--fg); }
+.player-clock { font-size: 0.85rem; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
 .player-controls { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
 .bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 24px; }
 .bars i { width: 5px; height: 100%; background: var(--fg); transform: scaleY(0.2); transform-origin: bottom; }

@@ -75,7 +75,11 @@
         "alt": "Rio Delacroix singing into a microphone on a smoky stage",
         "style": "Soul and funk showman / New Orleans, LA",
         "about": "Rio Delacroix learned to work a room at a family supper club and never learned to stand still. Two hours, no sit-down moment, a horn hit for every spin. Every night ends with an encore that has never been played the same way twice.",
-        "tracks": ["Velvet Ultimatum", "Chrome Heart Shuffle", "Platform Shoes Required"]
+        "audio": {
+          "src": "audio/rio.mp3",
+          "title": "Velvet Ultimatum",
+          "length": "2:47"
+        }
       },
       {
         "id": "june",
@@ -87,7 +91,11 @@
         "alt": "June Halloway singing into a microphone",
         "style": "Soul vocalist / Washington, DC",
         "about": "June Halloway grew up singing in DC church choirs and writes ballads that sound like late-night radio. June opens both nights, then comes back for a duet: a slow one on Friday, a fast one on Saturday.",
-        "tracks": ["Two Coats, One Umbrella", "Rain on the Radio Dial", "Roller Rink Royalty"]
+        "audio": {
+          "src": "audio/june.mp3",
+          "title": "Two Coats, One Umbrella",
+          "length": "2:21"
+        }
       },
       {
         "id": "theo",
@@ -99,7 +107,11 @@
         "alt": "Theo Okafor playing keys and singing on stage",
         "style": "Keys and musical director / Atlanta, GA",
         "about": "Theo Okafor leads The Chrome Section from behind a stack of keyboards. Theo counts in every scene, calls the breaks and decides when the band plays one more.",
-        "tracks": ["Porch Light On", "Countdown in Chrome", "Rhodes After Midnight"]
+        "audio": {
+          "src": "audio/band.mp3",
+          "title": "Countdown in Chrome",
+          "length": "2:43"
+        }
       },
       {
         "id": "brass",
@@ -111,7 +123,11 @@
         "alt": "The Brass Satellites' sax player blowing a solo on stage",
         "style": "Four-piece horn section / Philadelphia, PA",
         "about": "The Brass Satellites are two trumpets, a tenor sax and a trombone that play like twice as many. On Saturday they open the show from the lip of the stage.",
-        "tracks": ["Satellite Stomp", "Lip of the Stage", "Four Bells, No Waiting"]
+        "audio": {
+          "src": "audio/band.mp3",
+          "title": "Countdown in Chrome",
+          "length": "2:43"
+        }
       },
       {
         "id": "polyester",
@@ -123,7 +139,11 @@
         "alt": "DJ Polly Ester at the decks with headphones around the neck",
         "style": "Quiet-storm and disco DJ / Baltimore, MD",
         "about": "DJ Polly Ester digs for late-night soul and smooth grooves. Polly sets the mood before Friday's Slow Burn and keeps the lounge glowing at the afterparty.",
-        "tracks": ["Slow Sway Edit", "Candle in the Mix", "Quiet Storm Warning"]
+        "audio": {
+          "src": "audio/dj-friday.mp3",
+          "title": "Slow Sway Edit",
+          "length": "1:11"
+        }
       },
       {
         "id": "lavalamp",
@@ -135,7 +155,11 @@
         "alt": "DJ Lola Lava mixing with headphones on",
         "style": "Boogie and funk DJ / Chicago, IL",
         "about": "DJ Lola Lava plays boogie, roller-rink funk and drum breaks that pull people onto the floor. Lola warms up Saturday, scores the Dance Cam dance-off and closes the weekend at 2 AM.",
-        "tracks": ["Lava Flow Breaks", "Rink Lights On", "Boogie Down the Wharf"]
+        "audio": {
+          "src": "audio/dj-saturday.mp3",
+          "title": "Lava Flow Breaks",
+          "length": "1:25"
+        }
       },
       {
         "id": "bobbie",
@@ -157,9 +181,10 @@
       "tickets": "Get tickets",
       "play": "Play",
       "pause": "Pause",
-      "now": "Now spinning: {track}. Preview only, no sound.",
-      "note": "Preview player. Tracks are fictional.",
-      "tracksLabel": "Tracks"
+      "now": "Now playing: {track}.",
+      "note": "Preview clip. Artists and song titles are fictional.",
+      "error": "This preview could not play. Try again in a moment.",
+      "position": "Playback position"
     }
   },
 

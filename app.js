@@ -929,7 +929,8 @@
   // ---------- artist popup ----------
   // One <dialog>: a large panel on desktop, a full-screen sheet that slides up on phones. Closes with
   // the X, Escape or a click outside, and focus goes back to the card that opened it. Set times jump to
-  // that slot in the run of show. The record player is a preview only: no audio plays.
+  // that slot in the run of show. Listen opens a record player that plays the performer's preview clip
+  // (speakers.items[].audio). Nothing downloads until Play is pressed.
   function wireArtists() {
     var dlg = document.createElement("dialog");
     if (typeof dlg.showModal !== "function") return;
@@ -937,7 +938,7 @@
     dlg.id = "artist";
     dlg.setAttribute("aria-labelledby", "artist-name");
     document.body.appendChild(dlg);
-    var P = D.speakers.popup || {}, opener = null, jumping = false;
+    var P = D.speakers.popup || {}, opener = null, jumping = false, audio = null;
 
     function recordSvg(p) {
       var grooves = [88, 78, 68, 58, 48].map(function (r) { return '<circle cx="100" cy="100" r="' + r + '" fill="none" stroke="#b9bcc6" stroke-opacity="0.3"/>'; }).join("");
@@ -949,9 +950,9 @@
     function playerHtml(p) {
       return '<div class="player" id="artist-player" hidden>' +
         '<div class="player-deck"><div class="player-disc">' + recordSvg(p) + '<span class="tonearm" aria-hidden="true"></span></div>' +
-          '<div class="player-side"><ol class="player-tracks" aria-label="' + esc(P.tracksLabel || "Tracks") + '">' + p.tracks.map(function (t, i) {
-            return '<li><button type="button" class="player-track" data-track="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(t) + "</button></li>";
-          }).join("") + "</ol>" +
+          '<div class="player-side"><p class="player-title">' + esc(p.audio.title) + "</p>" +
+          '<div class="player-time"><progress class="player-progress" max="1" value="0" aria-label="' + esc(P.position || "Playback position") + '"></progress>' +
+          '<span class="player-clock"><span class="player-elapsed">0:00</span> / ' + esc(p.audio.length || "") + "</span></div>" +
           '<div class="player-controls"><button type="button" class="btn btn-primary btn-small player-play" aria-pressed="false">' + esc(P.play || "Play") + "</button>" +
           '<span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>' +
           '<p class="player-now" aria-live="polite"></p></div></div>' +
@@ -966,7 +967,7 @@
           return '<li><a href="#session-' + x.s.id + '"><span class="t">' + esc(fmtTime(sessionTimes(x.day, x.s).start)) + "</span> " + esc(x.s.title) + "</a></li>";
         }).join("") + "</ul></div>";
       }).join("");
-      var hasPlayer = p.tracks && p.tracks.length;
+      var hasPlayer = p.audio && p.audio.src;
       dlg.innerHTML = '<div class="artist-inner">' +
         '<button type="button" class="artist-close" aria-label="' + esc(P.close || "Close") + '"><span aria-hidden="true">&times;</span></button>' +
         '<div class="artist-media">' + (p.photo ? '<img src="' + esc(p.photo) + '" alt="' + esc(p.alt || p.name) + '" width="800" height="1000">' : "") + "</div>" +
@@ -988,18 +989,52 @@
       var p = byId(D.speakers.items, id);
       if (!p) return;
       opener = from;
+      stopAudio();
       render(p);
       dlg.showModal();
     }
-    function setPlaying(on) {
+    // One shared <audio> for the popup. The record spins and the bars move only while sound is actually playing.
+    function clock(s) { s = Math.floor(s || 0); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+    function showState(on, msg) {
       var pl = dlg.querySelector(".player");
       if (!pl) return;
       pl.classList.toggle("is-playing", on);
       var btn = pl.querySelector(".player-play");
       btn.setAttribute("aria-pressed", String(on));
       setLabel(btn, esc(on ? (P.pause || "Pause") : (P.play || "Play")));
-      var cur = pl.querySelector('.player-track[aria-pressed="true"]');
-      pl.querySelector(".player-now").textContent = on && cur ? (P.now || "{track}").replace("{track}", cur.textContent) : "";
+      pl.querySelector(".player-now").textContent = msg != null ? msg : on ? (P.now || "{track}").replace("{track}", dlg._artist.audio.title) : "";
+    }
+    function getAudio() {
+      if (audio) return audio;
+      audio = new Audio();
+      audio.preload = "none";
+      audio.addEventListener("playing", function () { showState(true); });
+      audio.addEventListener("pause", function () { showState(false); });
+      audio.addEventListener("ended", function () { audio.currentTime = 0; showState(false); });
+      audio.addEventListener("error", function () { if (audio.getAttribute("src")) showState(false, P.error || ""); });
+      audio.addEventListener("timeupdate", function () {
+        var pl = dlg.querySelector(".player");
+        if (!pl) return;
+        pl.querySelector(".player-progress").value = audio.duration ? audio.currentTime / audio.duration : 0;
+        pl.querySelector(".player-elapsed").textContent = clock(audio.currentTime);
+      });
+      return audio;
+    }
+    function setPlaying(on) {
+      var p = dlg._artist;
+      if (!on) { if (audio) audio.pause(); return; }
+      if (!p || !p.audio) return;
+      var a = getAudio();
+      if (a.getAttribute("src") !== p.audio.src) a.setAttribute("src", p.audio.src);
+      var r = a.play();
+      if (r && r.catch) r.catch(function () { showState(false, P.error || ""); });
+    }
+    function stopAudio() {
+      if (!audio) return;
+      audio.pause();
+      showState(false);
+      audio.removeAttribute("src");
+      audio.load();
     }
 
     // Open from anywhere on a lineup card, except its own set-time links.
@@ -1020,13 +1055,7 @@
         if (show) pl.querySelector(".player-play").focus(); else setPlaying(false);
         return;
       }
-      if (e.target.closest(".player-play")) { setPlaying(!dlg.querySelector(".player").classList.contains("is-playing")); return; }
-      var tr = e.target.closest(".player-track");
-      if (tr) {
-        Array.prototype.forEach.call(dlg.querySelectorAll(".player-track"), function (b) { b.setAttribute("aria-pressed", String(b === tr)); });
-        setPlaying(true);
-        return;
-      }
+      if (e.target.closest(".player-play")) { setPlaying(!audio || audio.paused); return; }
       var tix = e.target.closest(".artist-tickets");
       if (tix) {
         e.preventDefault();
@@ -1048,7 +1077,7 @@
       }
     });
     dlg.addEventListener("close", function () {
-      setPlaying(false);
+      stopAudio();
       if (!jumping && opener && document.contains(opener)) opener.focus();
       jumping = false;
     });
