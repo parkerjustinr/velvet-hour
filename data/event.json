@@ -12,7 +12,6 @@
     "address": "901 Wharf St SW, Washington, DC 20024",
     "pageTitle": "Velvet Hour 2026 - The Anthem, Washington, DC",
     "description": "Velvet Hour: a two-night live-band soul and funk revue at The Anthem, Washington, DC, Nov 20 and 21, 2026.",
-    "placeholderNotice": "Fictional event. Every performer, song, time and price on this page is invented.",
     "footerLine": "Fictional event made for the Happily Design Jam.",
     "creditLine": "Photos: Unsplash"
   },
@@ -66,15 +65,102 @@
     "intro": "One headliner, one opener who comes back for a duet, a band built for stamina, and a different DJ each night.",
     "linksLabel": "Set times",
     "items": [
-      {"id": "rio", "name": "Rio Delacroix", "role": "Headliner", "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.", "photo": "img/lineup/rio.jpg", "link": "", "alt": "Rio Delacroix singing into a microphone on a smoky stage"},
-      {"id": "june", "name": "June Halloway", "role": "Opener, and a different duet each night", "bio": "", "photo": "img/lineup/june.jpg", "link": "", "alt": "June Halloway singing into a microphone"},
-      {"id": "theo", "name": "Theo Okafor", "role": "Band leader and keys, The Chrome Section", "bio": "", "photo": "img/lineup/theo.jpg", "link": "", "alt": "Theo Okafor playing keys and singing on stage"},
-      {"id": "brass", "name": "The Brass Satellites", "role": "Horn section: two trumpets, tenor sax, trombone", "bio": "", "photo": "img/lineup/brass.jpg", "link": "", "alt": "The Brass Satellites' sax player blowing a solo on stage"},
-      {"id": "polyester", "name": "DJ Polly Ester", "role": "DJ, Fri - Slow Burn and the Friday afterparty", "bio": "", "photo": "img/lineup/polyester.jpg", "link": "", "alt": "DJ Polly Ester at the decks with headphones around the neck"},
-      {"id": "lavalamp", "name": "DJ Lola Lava", "role": "DJ, Sat - Full Funk and the Saturday afterparty", "bio": "", "photo": "img/lineup/lavalamp.jpg", "link": "", "alt": "DJ Lola Lava mixing with headphones on"},
-      {"id": "bobbie", "name": "Bobbie Dazzle", "role": "Host, Heart Cam and Dance Cam ringleader", "bio": "", "photo": "img/lineup/bobbie.jpg", "link": "", "alt": "Bobbie Dazzle in a black suit and sunglasses, adjusting a tie"},
-      {"id": "guest", "name": "Surprise guest", "role": "Sat - Full Funk only. Name not announced.", "bio": "", "photo": "img/lineup/guest.svg", "alt": "A plum silhouette with a gold question mark", "plain": true, "link": ""}
-    ]
+      {
+        "id": "rio",
+        "name": "Rio Delacroix",
+        "role": "Headliner",
+        "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.",
+        "photo": "img/lineup/rio.jpg",
+        "link": "",
+        "alt": "Rio Delacroix singing into a microphone on a smoky stage",
+        "style": "Soul and funk showman / New Orleans, LA",
+        "about": "Rio Delacroix learned to work a room at a family supper club and never learned to stand still. Two hours, no sit-down moment, a horn hit for every spin. Every night ends with an encore that has never been played the same way twice.",
+        "tracks": ["Velvet Ultimatum", "Chrome Heart Shuffle", "Platform Shoes Required"]
+      },
+      {
+        "id": "june",
+        "name": "June Halloway",
+        "role": "Opener, and a different duet each night",
+        "bio": "",
+        "photo": "img/lineup/june.jpg",
+        "link": "",
+        "alt": "June Halloway singing into a microphone",
+        "style": "Soul vocalist / Washington, DC",
+        "about": "June Halloway grew up singing in DC church choirs and writes ballads that sound like late-night radio. June opens both nights, then comes back for a duet: a slow one on Friday, a fast one on Saturday.",
+        "tracks": ["Two Coats, One Umbrella", "Rain on the Radio Dial", "Roller Rink Royalty"]
+      },
+      {
+        "id": "theo",
+        "name": "Theo Okafor",
+        "role": "Band leader and keys, The Chrome Section",
+        "bio": "",
+        "photo": "img/lineup/theo.jpg",
+        "link": "",
+        "alt": "Theo Okafor playing keys and singing on stage",
+        "style": "Keys and musical director / Atlanta, GA",
+        "about": "Theo Okafor leads The Chrome Section from behind a stack of keyboards. Theo counts in every scene, calls the breaks and decides when the band plays one more.",
+        "tracks": ["Porch Light On", "Countdown in Chrome", "Rhodes After Midnight"]
+      },
+      {
+        "id": "brass",
+        "name": "The Brass Satellites",
+        "role": "Horn section: two trumpets, tenor sax, trombone",
+        "bio": "",
+        "photo": "img/lineup/brass.jpg",
+        "link": "",
+        "alt": "The Brass Satellites' sax player blowing a solo on stage",
+        "style": "Four-piece horn section / Philadelphia, PA",
+        "about": "The Brass Satellites are two trumpets, a tenor sax and a trombone that play like twice as many. On Saturday they open the show from the lip of the stage.",
+        "tracks": ["Satellite Stomp", "Lip of the Stage", "Four Bells, No Waiting"]
+      },
+      {
+        "id": "polyester",
+        "name": "DJ Polly Ester",
+        "role": "DJ, Fri - Slow Burn and the Friday afterparty",
+        "bio": "",
+        "photo": "img/lineup/polyester.jpg",
+        "link": "",
+        "alt": "DJ Polly Ester at the decks with headphones around the neck",
+        "style": "Quiet-storm and disco DJ / Baltimore, MD",
+        "about": "DJ Polly Ester digs for late-night soul and smooth grooves. Polly sets the mood before Friday's Slow Burn and keeps the lounge glowing at the afterparty.",
+        "tracks": ["Slow Sway Edit", "Candle in the Mix", "Quiet Storm Warning"]
+      },
+      {
+        "id": "lavalamp",
+        "name": "DJ Lola Lava",
+        "role": "DJ, Sat - Full Funk and the Saturday afterparty",
+        "bio": "",
+        "photo": "img/lineup/lavalamp.jpg",
+        "link": "",
+        "alt": "DJ Lola Lava mixing with headphones on",
+        "style": "Boogie and funk DJ / Chicago, IL",
+        "about": "DJ Lola Lava plays boogie, roller-rink funk and drum breaks that pull people onto the floor. Lola warms up Saturday, scores the Dance Cam dance-off and closes the weekend at 2 AM.",
+        "tracks": ["Lava Flow Breaks", "Rink Lights On", "Boogie Down the Wharf"]
+      },
+      {
+        "id": "bobbie",
+        "name": "Bobbie Dazzle",
+        "role": "Host, Heart Cam and Dance Cam ringleader",
+        "bio": "",
+        "photo": "img/lineup/bobbie.jpg",
+        "link": "",
+        "alt": "Bobbie Dazzle in a black suit and sunglasses, adjusting a tie",
+        "style": "Host and crowd-cam ringleader / Washington, DC",
+        "about": "Bobbie Dazzle runs the room between scenes: the lottery draw, the crowd cam warm-up, Friday's Heart Cam and Saturday's dance-off. If you are on the big screen, Bobbie probably put you there."
+      },
+      {"id": "guest", "name": "Surprise guest", "role": "Sat - Full Funk only. Name not announced.", "bio": "", "photo": "img/lineup/guest.svg", "alt": "A plum silhouette with a gold question mark", "plain": true, "link": "", "about": "Saturday only. You'll know when the lights go out."}
+    ],
+    "viewLabel": "View artist",
+    "popup": {
+      "close": "Close",
+      "listen": "Listen",
+      "tickets": "Get tickets",
+      "play": "Play",
+      "pause": "Pause",
+      "now": "Now spinning: {track}. Preview only, no sound.",
+      "note": "Preview player. Tracks are fictional.",
+      "tracksLabel": "Tracks"
+    }
   },
 
   "schedule": {
@@ -148,7 +234,7 @@
       {"id": "r-nights", "group": "Your nights", "label": "Nights", "detail": "Single tickets are for Friday (Slow Burn) or Saturday (Full Funk); you choose at checkout. The Both nights pass gets you in on both.", "tiers": {"balcony": "Pick one", "floor": "Pick one", "rail": "Pick one", "vip": "Pick one", "both": "Fri and Sat"}},
       {"id": "r-save", "group": "Your nights", "label": "Saving on two nights", "detail": "Two Dance Floor singles cost $170. The Both nights pass is $150, so you save $20.", "tiers": {"balcony": "no", "floor": "no", "rail": "no", "vip": "no", "both": "Save $20"}},
       {"id": "r-floor", "group": "On the night", "label": "Dance floor access", "from": "track:floor", "tiers": {"balcony": "no", "floor": "yes", "rail": "yes", "vip": "yes", "both": "yes"}},
-      {"id": "r-seat", "group": "On the night", "label": "Reserved seat", "detail": "[PLACEHOLDER] A numbered balcony seat. Soundcheck VIP gets a balcony box seat on top of floor access.", "tiers": {"balcony": "yes", "floor": "no", "rail": "no", "vip": "Box seat", "both": "no"}},
+      {"id": "r-seat", "group": "On the night", "label": "Reserved seat", "detail": "A numbered balcony seat. Soundcheck VIP gets a balcony box seat on top of floor access.", "tiers": {"balcony": "yes", "floor": "no", "rail": "no", "vip": "Box seat", "both": "no"}},
       {"id": "r-lottery", "group": "On the night", "label": "Front rail lottery entry", "from": "session:n1-draw,session:n2-draw", "tiers": {"balcony": "no", "floor": "1 draw", "rail": "no", "vip": "no", "both": "1 draw a night"}},
       {"id": "r-rail", "group": "On the night", "label": "Guaranteed front rail", "detail": "A spot at the rail, held until the first scene starts.", "tiers": {"balcony": "no", "floor": "no", "rail": "yes", "vip": "yes", "both": "no"}},
       {"id": "r-early", "group": "On the night", "label": "Early entry", "from": "session:n1-early,session:n2-early", "tiers": {"balcony": "no", "floor": "no", "rail": "yes", "vip": "yes", "both": "no"}},
@@ -156,7 +242,7 @@
       {"id": "r-after", "group": "Extras", "label": "Afterparty", "from": "session:n1-after,session:n2-after", "tiers": {"balcony": "no", "floor": "no", "rail": "no", "vip": "yes", "both": "no"}},
       {"id": "r-merch", "group": "Extras", "label": "Merch", "detail": "Picked up at the merch desk. Front Rail and Both nights get the tour tee. Soundcheck VIP gets the tee and a numbered screen-printed poster.", "tiers": {"balcony": "no", "floor": "no", "rail": "Tee", "vip": "Tee and poster", "both": "Tee"}}
     ],
-    "footnote": "[PLACEHOLDER] Prices include fees. Tickets can be transferred until 48 hours before the show."
+    "footnote": "Prices include fees. Tickets can be transferred until 48 hours before the show."
   },
 
   "sponsors": {
@@ -169,12 +255,12 @@
     "intro": "The Anthem sits on The Wharf in Southwest DC. Metro is the easiest way in; plan your ride home before the encore.",
     "mapLink": "https://www.google.com/maps/search/?api=1&query=The+Anthem+901+Wharf+St+SW+Washington+DC",
     "items": [
-      {"title": "Address", "body": "[PLACEHOLDER] The Anthem, 901 Wharf St SW, Washington, DC 20024."},
-      {"title": "Metro", "body": "[PLACEHOLDER] Green Line to Waterfront station, then about a 10 minute walk to The Wharf. L'Enfant Plaza serves more lines and is a slightly longer walk. Check the last train time before you stay for the afterparty."},
-      {"title": "Rideshare", "body": "[PLACEHOLDER] Use the marked drop-off and pickup zone on Maine Ave SW. After the show, walk to the zone before you book; the streets right outside the doors back up fast."},
-      {"title": "Bag policy", "body": "[PLACEHOLDER] Clear bags or a small clutch only. No backpacks. Every bag is checked at the door."},
-      {"title": "ID", "body": "[PLACEHOLDER] Bring a photo ID. You need it for a drinks wristband, and Front Rail and Soundcheck VIP check-in matches the ID to the name on the ticket."},
-      {"title": "Accessibility", "body": "[PLACEHOLDER] Step-free entry, accessible balcony seating and a raised viewing platform beside the dance floor. Contact the box office before the show to arrange a spot or a companion seat."}
+      {"title": "Address", "body": "901 Wharf St SW, Washington, DC 20024, at The Wharf."},
+      {"title": "Metro", "body": "Waterfront station on the Green Line, about a 10-minute walk. Check the last train time before you stay for the afterparty."},
+      {"title": "Rideshare", "body": "Use the marked drop-off and pickup zone on Maine Ave SW. After the show, walk to the zone before you book; the streets right outside the doors back up fast."},
+      {"title": "Bag policy", "body": "A small purse or bag is fine. Backpacks and bags larger than a small purse are searched and go to coat check. No coolers, and no outside food or drinks."},
+      {"title": "ID", "body": "Bring a valid government-issued photo ID to buy or drink alcohol. Shows are all ages unless posted. Front Rail and Soundcheck VIP check-in matches your ID to the name on the ticket."},
+      {"title": "Accessibility", "body": "Accessible seating is available at every show. Request accommodations in advance through the venue."}
     ]
   },
 
@@ -221,7 +307,7 @@
       {"id": "request", "label": "A song you want the DJ to play", "type": "text", "required": false},
       {"id": "access", "label": "Access needs", "type": "textarea", "required": false, "hint": "Seating, step-free routes, a companion ticket, anything we should plan for."}
     ],
-    "confirmation": "[PLACEHOLDER] Your tickets arrive by email two weeks before the show. Bring the QR code and a photo ID. Dance Floor and Both nights holders are entered in that night's front rail draw when they scan in."
+    "confirmation": "Your tickets arrive by email two weeks before the show. Bring the QR code and a photo ID. Dance Floor and Both nights holders are entered in that night's front rail draw when they scan in."
   },
 
   "faq": {
@@ -237,8 +323,15 @@
       {"q": "When should I get there?", "a": "Doors are at 6:30 PM both nights and the crowd cam warm-up starts at 7:15 PM. Rio Delacroix is on stage around 9:30 PM. Front Rail and Soundcheck VIP can come in from 6:00 PM."},
       {"q": "Will I get confetti in the balcony?", "a": "On Saturday, yes. The gold confetti cannons are aimed at the whole room, balcony included. Friday ends with a slow dance under the mirror ball instead."},
       {"q": "Is there a dress code?", "a": "No. Velvet for Friday, sequins and platforms for Saturday, if you want a theme. Both catch the Dance Cam's eye."},
-      {"q": "Can I bring a bag or a camera?", "a": "[PLACEHOLDER] Clear bags and small clutches only. Phones are fine. Professional cameras with detachable lenses are not. See Getting there for the full bag policy."},
-      {"q": "Is there an age limit?", "a": "[PLACEHOLDER] All ages. Under 16s need to be with an adult. You need to be 21 with ID to buy alcohol."}
+      {"q": "Can I bring a bag or a camera?", "a": "A small purse or bag is fine. Backpacks and bags larger than a small purse are searched and go to coat check. No coolers, and no outside food or drinks. Phones are fine. Professional cameras with detachable lenses are not. See Getting there for the rest."},
+      {"q": "Is there an age limit?", "a": "Velvet Hour is all ages. Under 16s need to be with an adult. You need a valid government-issued photo ID to buy or drink alcohol."}
     ]
+  },
+
+  "marquee": {
+    "label": "Performers",
+    "pause": "Pause",
+    "play": "Play",
+    "hidden": "scrolling names"
   }
 }

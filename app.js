@@ -135,8 +135,8 @@
 
   R.about = function () {
     var a = D.about;
-    return sectionShell("about", a.heading, '<div class="about-copy">' + a.paragraphs.map(function (p, i) {
-      return "<p" + (i === 0 ? ' class="lede"' : "") + ">" + copy(p) + "</p>";
+    return sectionShell("about", a.heading, '<div class="about-copy">' + a.paragraphs.map(function (p) {
+      return "<p>" + copy(p) + "</p>";
     }).join("") + "</div>");
   };
 
@@ -157,13 +157,21 @@
           '" width="800" height="1000" loading="lazy" decoding="async">'
         : '<div class="' + cls + ' sp-initials" aria-hidden="true">' + esc(initials(p.name)) + "</div>";
     }
+    // Each card opens the artist popup: click anywhere on the card except its set-time links,
+    // or use the name button with the keyboard.
+    function media(p) {
+      return '<div class="sp-media">' + photo(p, "sp-photo") + '<span class="sp-tag" aria-hidden="true">' + esc(sp.viewLabel || "View artist") + "</span></div>";
+    }
+    function nameButton(p) {
+      return '<button type="button" class="sp-open" data-artist="' + esc(p.id) + '" aria-haspopup="dialog">' + esc(p.name) + "</button>";
+    }
     var first = sp.items[0], rest = sp.items.slice(1);
-    var featured = first ? '<article class="sp-featured" id="speaker-' + first.id + '">' + photo(first, "sp-photo") +
-      '<div class="sp-body"><h3 class="sp-name">' + esc(first.name) + '</h3><p class="sp-role">' + esc(first.role) + "</p>" +
+    var featured = first ? '<article class="sp-featured sp-hit" data-artist="' + esc(first.id) + '" id="speaker-' + first.id + '">' + media(first) +
+      '<div class="sp-body"><h3 class="sp-name">' + nameButton(first) + '</h3><p class="sp-role">' + esc(first.role) + "</p>" +
       '<p class="sp-bio">' + copy(first.bio) + "</p>" + sessionLinks(first.id) + "</div></article>" : "";
     var grid = '<ul class="sp-grid">' + rest.map(function (p) {
-      return '<li class="sp-card" id="speaker-' + p.id + '">' + photo(p, "sp-photo") +
-        '<h3 class="sp-name">' + (p.link ? '<a href="' + esc(p.link) + '">' + esc(p.name) + "</a>" : esc(p.name)) + "</h3>" +
+      return '<li class="sp-card sp-hit" data-artist="' + esc(p.id) + '" id="speaker-' + p.id + '">' + media(p) +
+        '<h3 class="sp-name">' + nameButton(p) + "</h3>" +
         '<p class="sp-role">' + esc(p.role) + "</p>" + sessionLinks(p.id) + "</li>";
     }).join("") + "</ul>";
     return sectionShell("speakers", sp.heading, (sp.intro ? '<p class="lede">' + copy(sp.intro) + "</p>" : "") + featured + grid);
@@ -823,6 +831,229 @@
     requestAnimationFrame(frame);
   }
 
+  // ---------- name marquee ----------
+  // A theater-marquee strip of performer names between the hero and About. Screen readers get the names
+  // once as text; the moving copy is hidden from them. Hover or the Pause button stops it.
+  function renderMarquee() {
+    var el = $("marquee");
+    if (!el) return;
+    var m = D.marquee || {}, names = D.speakers.items.filter(function (p) { return !p.plain; }).map(function (p) { return p.name; });
+    var row = names.map(function (n) {
+      return '<span class="mq-name">' + esc(n) + '</span><span class="mq-star" aria-hidden="true">&#9733;</span>';
+    }).join("");
+    el.setAttribute("aria-label", m.label || "Performers");
+    el.innerHTML = '<p class="sr">' + esc(names.join(", ")) + "</p>" +
+      '<div class="mq-track" aria-hidden="true"><div class="mq-row">' + row + '</div><div class="mq-row">' + row + "</div></div>" +
+      '<button type="button" class="mq-pause"><span class="mq-icon" aria-hidden="true"></span><span class="mq-label">' + esc(m.pause || "Pause") +
+      '</span><span class="sr"> ' + esc(m.hidden || "scrolling names") + "</span></button>";
+    el.querySelector(".mq-pause").addEventListener("click", function () {
+      var paused = el.classList.toggle("is-paused");
+      el.querySelector(".mq-label").textContent = paused ? (m.play || "Play") : (m.pause || "Pause");
+    });
+  }
+
+  // ---------- content flows in on scroll ----------
+  // Section headlines sharpen in word by word, lineup photos wipe up from the bottom edge, and cards and
+  // rows stagger in 60ms apart. Each element animates once, 450-550ms, and nothing waits more than 420ms.
+  // The hidden starting state only exists under html.reveal-on, which this script adds, so the page stays
+  // fully visible if the script fails. Reduced motion never adds it.
+  // Photos are observed through their wrapper: a fully clipped element never counts as intersecting.
+  var REVEAL = { words: ".section-title", wipe: ".sp-media", stagger: ".sp-featured, .sp-card, .session, .ruled > div, .faq-item" };
+  var revealIO = null;
+  function initReveal() {
+    if (!("IntersectionObserver" in window) || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    revealIO = new IntersectionObserver(function (entries) {
+      var k = 0;
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        revealIO.unobserve(e.target);
+        if (e.target.classList.contains("rv-stagger")) e.target.style.setProperty("--rv-delay", Math.min(k++, 7) * 60 + "ms");
+        e.target.classList.add("rv-in");
+      });
+    }, { rootMargin: "0px 0px -6% 0px" });
+    prepReveal($("sections"), false);
+    document.documentElement.classList.add("reveal-on");
+    // A fast jump (a nav link, a flick) can carry an element from below the screen to above it in one
+    // frame without it ever counting as intersecting. Anything already scrolled past is shown at once.
+    var queued = false;
+    window.addEventListener("scroll", function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        Array.prototype.forEach.call(document.querySelectorAll(".rv:not(.rv-in)"), function (el) {
+          if (el.getClientRects().length && el.getBoundingClientRect().bottom <= 0) { revealIO.unobserve(el); el.classList.add("rv-in"); }
+        });
+      });
+    }, { passive: true });
+    // Keyboard focus never lands on something still hidden: focusing reveals it and its containers at once.
+    document.addEventListener("focusin", function (e) {
+      for (var el = e.target; el && el !== document.body; el = el.parentElement) {
+        if (el.classList && el.classList.contains("rv") && !el.classList.contains("rv-in")) { revealIO.unobserve(el); el.classList.add("rv-in"); }
+      }
+    });
+  }
+  // instant: for sections re-rendered after a user action, show them at once instead of animating again.
+  function prepReveal(root, instant) {
+    if (!revealIO || !root) return;
+    function mark(sel, kind) {
+      Array.prototype.forEach.call(root.querySelectorAll(sel), function (el) {
+        if (el.classList.contains("rv")) return;
+        if (kind === "rv-words") splitWords(el);
+        el.classList.add("rv", kind);
+        if (instant) el.classList.add("rv-in"); else revealIO.observe(el);
+      });
+    }
+    mark(REVEAL.words, "rv-words");
+    mark(REVEAL.wipe, "rv-wipe");
+    mark(REVEAL.stagger, "rv-stagger");
+  }
+  function splitWords(h) {
+    var words = h.textContent.trim().split(/\s+/);
+    h.innerHTML = words.map(function (w, i) { return '<span class="rv-w" style="--w:' + Math.min(i, 7) + '">' + esc(w) + "</span>"; }).join(" ");
+  }
+
+  // ---------- button label roll ----------
+  // On hover or focus the label rolls up and out while an identical copy rolls in from below.
+  // The copy is aria-hidden, so the accessible name is read once.
+  function rollOne(b) {
+    if (b.querySelector(":scope > .roll")) return;
+    var html = b.innerHTML;
+    b.innerHTML = '<span class="roll"><span class="roll-a">' + html + '</span><span class="roll-b" aria-hidden="true">' + html + "</span></span>";
+  }
+  function rollify(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll(".btn, .fx-btn"), rollOne);
+  }
+  function setLabel(b, html) { b.innerHTML = html; rollOne(b); }
+
+  // ---------- artist popup ----------
+  // One <dialog>: a large panel on desktop, a full-screen sheet that slides up on phones. Closes with
+  // the X, Escape or a click outside, and focus goes back to the card that opened it. Set times jump to
+  // that slot in the run of show. The record player is a preview only: no audio plays.
+  function wireArtists() {
+    var dlg = document.createElement("dialog");
+    if (typeof dlg.showModal !== "function") return;
+    dlg.className = "artist";
+    dlg.id = "artist";
+    dlg.setAttribute("aria-labelledby", "artist-name");
+    document.body.appendChild(dlg);
+    var P = D.speakers.popup || {}, opener = null, jumping = false;
+
+    function recordSvg(p) {
+      var grooves = [88, 78, 68, 58, 48].map(function (r) { return '<circle cx="100" cy="100" r="' + r + '" fill="none" stroke="#b9bcc6" stroke-opacity="0.3"/>'; }).join("");
+      return '<svg class="record" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="98" fill="#1c0718" stroke="#b9bcc6" stroke-width="2"/>' + grooves +
+        '<path d="M100 16 A84 84 0 0 1 176 64" fill="none" stroke="#f7ead3" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round"/>' +
+        '<circle cx="100" cy="100" r="34" fill="#f7ead3"/><text x="100" y="109" text-anchor="middle" font-family="Shrikhand, Georgia, serif" font-size="24" fill="#2b0e25">' +
+        esc(initials(p.name)) + '</text><circle cx="100" cy="100" r="4" fill="#1c0718"/></svg>';
+    }
+    function playerHtml(p) {
+      return '<div class="player" id="artist-player" hidden>' +
+        '<div class="player-deck"><div class="player-disc">' + recordSvg(p) + '<span class="tonearm" aria-hidden="true"></span></div>' +
+          '<div class="player-side"><ol class="player-tracks" aria-label="' + esc(P.tracksLabel || "Tracks") + '">' + p.tracks.map(function (t, i) {
+            return '<li><button type="button" class="player-track" data-track="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(t) + "</button></li>";
+          }).join("") + "</ol>" +
+          '<div class="player-controls"><button type="button" class="btn btn-primary btn-small player-play" aria-pressed="false">' + esc(P.play || "Play") + "</button>" +
+          '<span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>' +
+          '<p class="player-now" aria-live="polite"></p></div></div>' +
+        '<p class="player-note">' + esc(P.note || "") + "</p></div>";
+    }
+    function render(p) {
+      var list = speakerSessions()[p.id] || [];
+      var nights = D.schedule.days.map(function (day) {
+        var mine = list.filter(function (x) { return x.day.id === day.id; });
+        if (!mine.length) return "";
+        return '<div class="artist-night"><h3>' + esc(day.label) + '</h3><ul class="artist-slots">' + mine.map(function (x) {
+          return '<li><a href="#session-' + x.s.id + '"><span class="t">' + esc(fmtTime(sessionTimes(x.day, x.s).start)) + "</span> " + esc(x.s.title) + "</a></li>";
+        }).join("") + "</ul></div>";
+      }).join("");
+      var hasPlayer = p.tracks && p.tracks.length;
+      dlg.innerHTML = '<div class="artist-inner">' +
+        '<button type="button" class="artist-close" aria-label="' + esc(P.close || "Close") + '"><span aria-hidden="true">&times;</span></button>' +
+        '<div class="artist-media">' + (p.photo ? '<img src="' + esc(p.photo) + '" alt="' + esc(p.alt || p.name) + '" width="800" height="1000">' : "") + "</div>" +
+        '<div class="artist-body">' +
+          '<h2 class="artist-name" id="artist-name">' + esc(p.name) + "</h2>" +
+          (p.style ? '<p class="artist-style">' + esc(p.style) + "</p>" : "") +
+          '<p class="artist-bio">' + copy(p.about || p.bio || "") + "</p>" +
+          (nights ? '<div class="artist-nights">' + nights + "</div>" : "") +
+          '<div class="artist-actions">' +
+            (hasPlayer ? '<button type="button" class="btn artist-listen" aria-expanded="false" aria-controls="artist-player">' + esc(P.listen || "Listen") + "</button>" : "") +
+            '<a class="btn btn-primary artist-tickets" href="#tickets">' + esc(P.tickets || "Get tickets") + ' <span class="arrow" aria-hidden="true">&rarr;</span></a>' +
+          "</div>" +
+          (hasPlayer ? playerHtml(p) : "") +
+        "</div></div>";
+      rollify(dlg);
+      dlg._artist = p;
+    }
+    function open(id, from) {
+      var p = byId(D.speakers.items, id);
+      if (!p) return;
+      opener = from;
+      render(p);
+      dlg.showModal();
+    }
+    function setPlaying(on) {
+      var pl = dlg.querySelector(".player");
+      if (!pl) return;
+      pl.classList.toggle("is-playing", on);
+      var btn = pl.querySelector(".player-play");
+      btn.setAttribute("aria-pressed", String(on));
+      setLabel(btn, esc(on ? (P.pause || "Pause") : (P.play || "Play")));
+      var cur = pl.querySelector('.player-track[aria-pressed="true"]');
+      pl.querySelector(".player-now").textContent = on && cur ? (P.now || "{track}").replace("{track}", cur.textContent) : "";
+    }
+
+    // Open from anywhere on a lineup card, except its own set-time links.
+    document.addEventListener("click", function (e) {
+      var hit = e.target.closest && e.target.closest(".sp-hit");
+      if (!hit || e.target.closest("a")) return;
+      open(hit.getAttribute("data-artist"), hit.querySelector(".sp-open"));
+    });
+
+    dlg.addEventListener("click", function (e) {
+      if (e.target === dlg) { dlg.close(); return; }                       // click on the backdrop
+      if (e.target.closest(".artist-close")) { dlg.close(); return; }
+      var listen = e.target.closest(".artist-listen");
+      if (listen) {
+        var pl = dlg.querySelector(".player"), show = pl.hidden;
+        pl.hidden = !show;
+        listen.setAttribute("aria-expanded", String(show));
+        if (show) pl.querySelector(".player-play").focus(); else setPlaying(false);
+        return;
+      }
+      if (e.target.closest(".player-play")) { setPlaying(!dlg.querySelector(".player").classList.contains("is-playing")); return; }
+      var tr = e.target.closest(".player-track");
+      if (tr) {
+        Array.prototype.forEach.call(dlg.querySelectorAll(".player-track"), function (b) { b.setAttribute("aria-pressed", String(b === tr)); });
+        setPlaying(true);
+        return;
+      }
+      var tix = e.target.closest(".artist-tickets");
+      if (tix) {
+        e.preventDefault();
+        jumping = true;
+        dlg.close();
+        var sec = $("tickets"), h = $("tickets-title");
+        if (sec) sec.scrollIntoView();
+        if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+        history.replaceState(null, "", "#tickets");
+        return;
+      }
+      // Set-time links: close first, then the page-wide handler switches the night tab and scrolls to the slot.
+      var slot = e.target.closest('a[href^="#session-"]');
+      if (slot) {
+        jumping = true;
+        dlg.close();
+        var target = $(slot.getAttribute("href").slice(1));
+        setTimeout(function () { if (target) { target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); } }, 0);
+      }
+    });
+    dlg.addEventListener("close", function () {
+      setPlaying(false);
+      if (!jumping && opener && document.contains(opener)) opener.focus();
+      jumping = false;
+    });
+  }
+
   // ---------- wiring ----------
   function wireTabs() {
     var root = $("schedule");
@@ -863,7 +1094,7 @@
       if (radio) radio.checked = true;
     }
     var cta = $("tier-cta");
-    if (cta && tier) cta.innerHTML = "Register with " + esc(tier.name) + ", " + esc(tier.price) + ' <span class="arrow" aria-hidden="true">&rarr;</span>';
+    if (cta && tier) { cta.innerHTML = "Register with " + esc(tier.name) + ", " + esc(tier.price) + ' <span class="arrow" aria-hidden="true">&rarr;</span>'; rollOne(cta); }
     var sel = $("f-tier");
     if (sel) sel.value = id;
   }
@@ -932,12 +1163,13 @@
           return '<button type="button" class="btn btn-small" data-ics-day="' + d.id + '" data-ics-tier="' + rec.tier.id + '">Add ' + esc(d.label) + " to calendar</button>";
         }).join("") + '<button type="button" class="btn btn-small" id="reg-again">Register someone else</button></div>' +
       "</div>";
+    rollify($("reg-out"));
     $("reg-confirm").focus();
     fireConfetti();
     $("reg-again").addEventListener("click", function () {
       var sec = $("register");
       sec.outerHTML = R.register();
-      wireForm(); lightScenes();
+      wireForm(); lightScenes(); prepReveal($("register"), true); rollify($("register"));
       $("f-name").focus();
     });
   }
@@ -951,6 +1183,7 @@
       if (old && R[id]) old.outerHTML = R[id]();
     });
     wireTabs(); wireMatrix(); lightScenes();
+    ["schedule", "speakers", "tickets"].forEach(function (id) { if ($(id)) { prepReveal($(id), true); rollify($(id)); } });
     if (selId && $(selId)) selectTab($(selId), false);
   }
 
@@ -1033,8 +1266,10 @@
       D = data;
       renderHero();
       renderChrome();
-      wireTabs(); wireMatrix(); wireForm(); wireGlobal(); wireDanceCam();
+      renderMarquee();
+      wireTabs(); wireMatrix(); wireForm(); wireGlobal(); wireDanceCam(); wireArtists();
       danceFloor(); lightScenes();
+      rollify(document); initReveal();
       if (location.hash.length > 1) {
         var target = $(location.hash.slice(1));
         if (target) target.scrollIntoView();
