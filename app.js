@@ -110,7 +110,24 @@
       "</div>" +
       (h.facts && h.facts.length ? '<ul class="hero-facts" aria-label="At a glance">' + h.facts.map(function (f) {
         return '<li><span class="n">' + esc(f.value) + '</span><span class="l">' + esc(f.label) + "</span></li>";
-      }).join("") + "</ul>" : "");
+      }).join("") + "</ul>" : "") +
+      (h.nights ? renderNights(h.nights) : "");
+  }
+  // "Pick your night": one panel per night, each linking to that night's run-of-show tab.
+  function renderNights(n) {
+    return '<div class="nights"><h2 class="nights-title" id="nights-title">' + copy(n.heading) + "</h2>" +
+      '<div class="nights-grid">' + n.items.map(function (x, i) {
+        return '<article class="night night-' + (i + 1) + '" aria-labelledby="night-' + x.day + '">' +
+          '<p class="night-date">' + esc(x.date) + '</p><h3 class="night-name" id="night-' + x.day + '">' + esc(x.name) + "</h3>" +
+          '<ul class="night-points">' + x.points.map(function (pt) {
+            var tr = byId(D.tracks, pt.track);
+            return '<li class="track-' + trackIndex(pt.track) + '"><span class="swatch" aria-hidden="true"></span><span>' + copy(pt.text) +
+              (tr ? '<span class="sr"> (' + esc(tr.name) + ")</span>" : "") + "</span></li>";
+          }).join("") + "</ul>" +
+          '<a class="btn btn-small night-link" href="#tab-' + x.day + '">' + esc(x.link) + ' <span class="arrow" aria-hidden="true">&rarr;</span></a>' +
+        "</article>";
+      }).join("") + "</div>" +
+      (n.note ? '<p class="nights-note">' + copy(n.note) + "</p>" : "") + "</div>";
   }
 
   // ---------- sections ----------
@@ -343,16 +360,41 @@
     floor.className = "floor";
     host.appendChild(floor);
     var GAP = 3, cells = [], cols = 0, rows = 0, pitch = 0, tick = 0, scrollStep = 0, timer = null, onScreen = true, lastCell = null, hue = 0;
+    // Tiles directly behind hero text stay dim (30% brightness) so the text keeps its contrast.
+    var TEXT = ".hero-when, .hero h1 span, .hero-sub, .nights-title, .nights-note";
+    function markDim() {
+      if (!cells.length) return;
+      var box = host.getBoundingClientRect(), rects = [], PAD = 6;
+      Array.prototype.forEach.call(document.querySelectorAll(TEXT), function (el) {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        Array.prototype.forEach.call(range.getClientRects(), function (r) { if (r.width && r.height) rects.push(r); });
+      });
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          var x = box.left + GAP + c * pitch, y = box.top + GAP + r * pitch, size = pitch - GAP, dim = false;
+          for (var k = 0; k < rects.length && !dim; k++) {
+            var q = rects[k];
+            dim = x < q.right + PAD && x + size > q.left - PAD && y < q.bottom + PAD && y + size > q.top - PAD;
+          }
+          var el = cells[r * cols + c];
+          el._dim = dim;
+          el.classList.toggle("dim", dim);
+        }
+      }
+    }
+    function cls(el, name) { el.className = name + (el._dim ? " dim" : ""); }
 
     function build() {
       var size = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cell")) || 44;
       pitch = size + GAP;
       var c = Math.ceil(host.clientWidth / pitch) + 1, r = Math.ceil(host.clientHeight / pitch) + 1;
-      if (c === cols && r === rows) return;
+      if (c === cols && r === rows) { markDim(); return; }
       cols = c; rows = r;
       floor.style.setProperty("--cols", cols);
       floor.innerHTML = new Array(cols * rows + 1).join("<i></i>");
       cells = floor.children;
+      markDim();
       paint();
     }
     function paint() {
@@ -363,7 +405,7 @@
           if (el._until > now) continue;
           var d = c + r - phase, m = ((d % 7) + 7) % 7, band = Math.floor(d / 7);
           var lit = m === 0 || (still && m === 3) || ((c * 31 + r * 17 + phase * 7) % 23 === 0);
-          el.className = lit ? "l" + ((((band + (m === 3 ? 1 : 0)) % 3) + 3) % 3 + 1) : "";
+          cls(el, lit ? "l" + ((((band + (m === 3 ? 1 : 0)) % 3) + 3) % 3 + 1) : "");
         }
       }
     }
@@ -376,13 +418,15 @@
       lastCell = el;
       var h = hue = hue % 3 + 1;
       el._until = Date.now() + 700;
-      el.className = "l" + h + " hot";
-      setTimeout(function () { el.className = "l" + h; }, 120);
+      cls(el, "l" + h + " hot");
+      setTimeout(function () { cls(el, "l" + h); }, 120);
     }
     function start() { if (!timer && !still && onScreen && !document.hidden) timer = setInterval(function () { tick++; paint(); }, 560); }
     function stop() { clearInterval(timer); timer = null; }
 
     build();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(markDim);
+    if ("ResizeObserver" in window) new ResizeObserver(function () { markDim(); }).observe($("hero"));
     var resizeT;
     window.addEventListener("resize", function () { clearTimeout(resizeT); resizeT = setTimeout(build, 150); });
     if (still) return;
@@ -655,6 +699,19 @@
         var tier = ics.getAttribute("data-ics-tier");
         var copyDay = { id: day.id, date: day.date, label: day.label, sessions: day.sessions.filter(function (s) { return !tier || !s.tiers || s.tiers.indexOf(tier) > -1; }) };
         downloadIcs([copyDay], (D.meta.shortName || "event") + "-" + day.id + ".ics");
+        return;
+      }
+      // "Pick your night" links open that night's tab and bring the run of show into view.
+      var tl = t.closest('a[href^="#tab-"]');
+      if (tl) {
+        var tab = $(tl.getAttribute("href").slice(1));
+        if (tab) {
+          e.preventDefault();
+          selectTab(tab, false);
+          $("schedule").scrollIntoView();
+          tab.focus({ preventScroll: true });
+          history.replaceState(null, "", "#schedule");
+        }
         return;
       }
       // Links into a hidden schedule day switch the tab first.

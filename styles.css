@@ -111,25 +111,53 @@ main:focus { outline: none; }
 .floor i.l2 { background: var(--track-2); }
 .floor i.l3 { background: var(--track-3); }
 .floor i.hot { transition-duration: 60ms; }
+/* Tiles behind hero text: 30% brightness, so cream text stays above 4.5:1. */
+.floor i.dim.l1 { background: color-mix(in srgb, var(--track-1) 30%, var(--bg-deep)); }
+.floor i.dim.l2 { background: color-mix(in srgb, var(--track-2) 30%, var(--bg-deep)); }
+.floor i.dim.l3 { background: color-mix(in srgb, var(--track-3) 30%, var(--bg-deep)); }
 .hero-inner { position: relative; max-width: var(--max); margin: 0 auto; padding: 32px var(--gutter) 40px; }
-/* Text sits on solid plum cards, like TV captions, so the lit floor never covers it. */
-.hero-when, .hero h1 span, .hero-sub { background: var(--bg); }
-.hero-when { display: inline-block; font-weight: 700; margin-bottom: 16px; padding: 6px 12px; border: var(--rule); }
+/* Text sits straight on the floor. The tiles behind it are dimmed in app.js. */
+.hero-when { display: table; font-weight: 700; font-size: 1.05rem; margin-bottom: 14px; }
 .hero-when .sep { margin: 0 10px; color: var(--chrome); }
+/* Title card: cream fill with a thick plum outline, so it reads over any tile. */
 .hero h1 { font-size: clamp(3.3rem, 23vw, 10.5rem); line-height: 1; margin-bottom: 20px; }
-.hero h1 span { display: table; padding: 0.02em 0.16em 0.12em 0.1em; }
-.hero h1 span + span { margin-top: -2px; }
-.hero-sub { max-width: 46ch; font-size: 1.15rem; margin-bottom: 20px; padding: 14px 16px; border-left: 4px solid var(--chrome); }
-.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
+.hero h1 span { display: table; padding: 0 0.08em 0.06em 0; -webkit-text-stroke: 0.14em var(--bg); paint-order: stroke fill; }
+.hero-sub { display: table; max-width: 46ch; font-size: 1.15rem; font-weight: 600; margin-bottom: 22px; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px; }
 .hero-ctas .btn { flex: 1 1 160px; }
-.hero-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; background: var(--chrome); border: 3px solid var(--chrome); max-width: 760px; }
-.hero-facts li { background: var(--bg); padding: 10px 14px 12px; }
-.hero-facts .n { display: block; font-family: var(--display); font-size: clamp(2.2rem, 10vw, 3.4rem); line-height: 1.1; }
-.hero-facts .l { font-size: 0.95rem; color: var(--muted); }
+
+/* Pick your night: two panels that do not match on purpose. */
+.nights-title { display: table; font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 14px; -webkit-text-stroke: 0.12em var(--bg); paint-order: stroke fill; }
+.nights-grid { display: grid; gap: 16px; }
+.night { display: grid; gap: 10px; align-content: start; padding: 20px 18px; }
+.night-date { margin: 0; font-weight: 700; }
+.night-name { font-size: clamp(2.2rem, 9vw, 3.2rem); line-height: 1.05; }
+.night-points { display: grid; gap: 8px; margin-bottom: 8px; }
+.night-points li { display: flex; gap: 10px; align-items: baseline; }
+.night-points .swatch { flex: none; width: 12px; height: 12px; }
+.night-link { justify-self: start; }
+/* Slow Burn: plum, quiet, hairline list */
+.night-1 { background: var(--bg); border: var(--rule); }
+.night-1 .night-date { color: var(--muted); }
+.night-1 .night-points { gap: 0; }
+.night-1 .night-points li { padding: 8px 0; border-top: var(--hair); }
+/* Full Funk: cream field, louder type, punchy list */
+.night-2 { background: var(--fg); color: var(--bg); border: 6px solid var(--bg); outline: 3px solid var(--chrome); outline-offset: -3px; }
+.night-2 .night-date { display: inline-block; justify-self: start; background: var(--bg); color: var(--fg); padding: 2px 10px; }
+.night-2 .night-name { font-size: clamp(2.8rem, 12vw, 4.6rem); }
+.night-2 .night-points { font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 0.95rem; }
+.night-2 .btn { background: var(--bg); color: var(--fg); border-color: var(--bg); }
+.night-2 .btn:hover { background: var(--bg-deep); border-color: var(--bg-deep); }
+.night-2 :focus-visible { outline-color: var(--bg); }
+.nights-note { display: table; margin: 16px 0 0; font-weight: 700; font-size: 1.1rem; }
 @media (min-width: 720px) {
   .hero-inner { padding-top: 64px; padding-bottom: 64px; }
   .hero-ctas .btn { flex: 0 0 auto; min-width: 200px; }
-  .hero-facts { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 760px) {
+  .nights-grid { grid-template-columns: 5fr 7fr; align-items: stretch; max-width: 1040px; }
+  .night { padding: 24px; }
+  .night-2 .night-points { grid-template-columns: 1fr 1fr; gap: 10px 24px; }
 }
 
 /* ---------- sections as scenes ---------- */
@@ -147,14 +175,15 @@ main:focus { outline: none; }
 .lede { font-size: 1.15rem; max-width: 60ch; }
 .note { font-size: 0.95rem; color: var(--muted); }
 
-/* About: the one cream scene. Heading left, copy right. */
+/* About: the one cream scene. Full-width headline, copy in an offset column below. */
 .sec-about { background: var(--fg); color: var(--bg); }
 .sec-about :focus-visible { outline-color: var(--bg); }
+.sec-about .section-title { font-size: clamp(2.5rem, 6.2vw, 5rem); margin-bottom: 32px; }
 .about-copy p { max-width: 62ch; }
 .about-copy .lede { font-size: clamp(1.2rem, 3.6vw, 1.5rem); line-height: 1.45; font-weight: 600; }
-@media (min-width: 880px) {
-  .sec-about .wrap { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: start; }
-  .sec-about .section-title { margin: 0; }
+@media (min-width: 880px) { .about-copy { margin-left: 25%; } }
+@media (min-width: 1040px) {
+  .about-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 }
 
 /* ---------- lineup: headliner marquee, then nameplates ---------- */
@@ -284,7 +313,7 @@ td.is-sel .yes { color: var(--gold); }
   .matrix thead th { display: block; }
   .m-group th { display: block; }
   .matrix tr[hidden] { display: none; }
-  .matrix .m-row, .matrix tfoot tr { display: grid; grid-template-columns: repeat(var(--tiers, 4), 1fr); border-top: var(--hair); padding: 10px 0; }
+  .matrix .m-row, .matrix tfoot tr { display: grid; grid-template-columns: repeat(var(--tiers, 4), 1fr); border-top: var(--hair); padding: 10px 0; column-gap: 6px; }
   .matrix tfoot tr { border-top: var(--rule); }
   .matrix .m-row th, .matrix tfoot th { grid-column: 1 / -1; padding-bottom: 6px; }
   .matrix .m-row td, .matrix tfoot td { display: grid; gap: 2px; align-content: start; font-size: 0.95rem; }
