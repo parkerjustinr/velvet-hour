@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "name": "Sample Event",
+    "shortName": "SE",
+    "year": "2026",
+    "tagline": "[PLACEHOLDER] One line that says what this event is and who it is for.",
+    "timezone": "America/New_York",
+    "tzLabel": "ET",
+    "dates": "Sat, Nov 14 - Sun, Nov 15, 2026",
+    "venue": "Sample Venue",
+    "city": "City, ST",
+    "address": "123 Sample St, City, ST 00000",
+    "pageTitle": "Sample Event 2026 - City, ST",
+    "description": "[PLACEHOLDER] Meta description: what, when, where, in one sentence.",
+    "placeholderNotice": "Sample content. Every name, time, and price on this page is placeholder.",
+    "footerLine": "Event site concept built on Arrived."
+  },
+
+  "sections": [
+    { "id": "about", "label": "About", "on": true },
+    { "id": "speakers", "label": "Speakers", "on": true },
+    { "id": "schedule", "label": "Schedule", "on": true },
+    { "id": "tickets", "label": "Tickets", "on": true },
+    { "id": "sponsors", "label": "Sponsors", "on": true },
+    { "id": "venue", "label": "Getting there", "on": true },
+    { "id": "register", "label": "Register", "on": true },
+    { "id": "faq", "label": "FAQ", "on": true }
+  ],
+
+  "hero": {
+    "title": ["Sample", "Event"],
+    "sub": "[PLACEHOLDER] Two sentences max. What happens, who should come, why this year.",
+    "primaryCta": { "label": "Get tickets", "href": "#tickets" },
+    "secondaryCta": { "label": "See the schedule", "href": "#schedule" },
+    "facts": [
+      { "value": "2", "label": "Days" },
+      { "value": "24", "label": "Sessions" },
+      { "value": "12", "label": "Speakers" },
+      { "value": "600", "label": "Seats" }
+    ]
+  },
+
+  "about": {
+    "heading": "[PLACEHOLDER] About heading that says something specific",
+    "paragraphs": [
+      "[PLACEHOLDER] First paragraph. The one thing that makes this event different.",
+      "[PLACEHOLDER] Second paragraph. What a first-timer should expect."
+    ]
+  },
+
+  "tracks": [
+    { "id": "main", "name": "Main Stage" },
+    { "id": "studio", "name": "Studio" },
+    { "id": "social", "name": "Social" }
+  ],
+
+  "speakers": {
+    "heading": "Speakers",
+    "intro": "[PLACEHOLDER] One line on who is speaking and why it matters.",
+    "items": [
+      { "id": "sp1", "name": "Speaker One", "role": "Title, Organization", "bio": "[PLACEHOLDER] Two-line bio for the featured speaker. This person gets the big slot.", "photo": "", "link": "" },
+      { "id": "sp2", "name": "Speaker Two", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
+      { "id": "sp3", "name": "Speaker Three", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
+      { "id": "sp4", "name": "Speaker Four", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
+      { "id": "sp5", "name": "Speaker Five", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" },
+      { "id": "sp6", "name": "Speaker Six", "role": "Title, Organization", "bio": "[PLACEHOLDER] Short bio.", "photo": "", "link": "" }
+    ]
+  },
+
+  "schedule": {
+    "heading": "Schedule",
+    "note": "[PLACEHOLDER] Times are draft.",
+    "days": [
+      {
+        "id": "d1",
+        "label": "Day 1",
+        "date": "2026-11-14",
+        "title": "Saturday, Nov 14",
+        "sessions": [
+          { "id": "s101", "start": "09:00", "end": "10:00", "title": "Doors and check-in", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Badge pickup at the front desk.", "tiers": ["full", "day1", "vip"] },
+          { "id": "s102", "start": "10:00", "end": "10:45", "title": "Opening keynote", "track": "main", "speakers": ["sp1"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
+          { "id": "s103", "start": "11:00", "end": "12:00", "title": "Panel session", "track": "main", "speakers": ["sp2", "sp3"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
+          { "id": "s104", "start": "11:00", "end": "12:30", "title": "Hands-on workshop", "track": "studio", "speakers": ["sp4"], "detail": "[PLACEHOLDER] Limited seats.", "tiers": ["full", "vip"] },
+          { "id": "s105", "start": "12:30", "end": "13:30", "title": "Lunch", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Included with Full and VIP.", "tiers": ["full", "vip"] },
+          { "id": "s106", "start": "14:00", "end": "15:00", "title": "Fireside chat", "track": "main", "speakers": ["sp5"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day1", "vip"] },
+          { "id": "s107", "start": "18:00", "end": "20:00", "title": "Speaker dinner", "track": "social", "speakers": ["sp1", "sp6"], "detail": "[PLACEHOLDER] VIP only.", "tiers": ["vip"] }
+        ]
+      },
+      {
+        "id": "d2",
+        "label": "Day 2",
+        "date": "2026-11-15",
+        "title": "Sunday, Nov 15",
+        "sessions": [
+          { "id": "s201", "start": "09:30", "end": "10:00", "title": "Doors", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Coffee in the lobby.", "tiers": ["full", "day2", "vip"] },
+          { "id": "s202", "start": "10:00", "end": "11:00", "title": "Morning keynote", "track": "main", "speakers": ["sp6"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day2", "vip"] },
+          { "id": "s203", "start": "11:15", "end": "12:30", "title": "Studio session", "track": "studio", "speakers": ["sp3", "sp4"], "detail": "[PLACEHOLDER] Limited seats.", "tiers": ["full", "vip"] },
+          { "id": "s204", "start": "13:30", "end": "14:30", "title": "Closing talk", "track": "main", "speakers": ["sp2"], "detail": "[PLACEHOLDER] Session description.", "tiers": ["full", "day2", "vip"] },
+          { "id": "s205", "start": "15:00", "end": "17:00", "title": "Closing party", "track": "social", "speakers": [], "detail": "[PLACEHOLDER] Everyone welcome.", "tiers": ["full", "day2", "vip"] }
+        ]
+      }
+    ]
+  },
+
+  "tickets": {
+    "heading": "Tickets",
+    "intro": "[PLACEHOLDER] One line. Pick a column to choose a ticket. Hover or tap a row to see exactly what it covers.",
+    "recommended": "full",
+    "tiers": [
+      { "id": "day1", "name": "Day 1", "price": "$45", "note": "Sat only", "days": 1 },
+      { "id": "day2", "name": "Day 2", "price": "$45", "note": "Sun only", "days": 1 },
+      { "id": "full", "name": "Full pass", "price": "$80", "note": "Both days", "days": 2 },
+      { "id": "vip", "name": "VIP", "price": "$150", "note": "Both days, plus", "days": 2 }
+    ],
+    "rows": [
+      { "id": "r-d1", "group": "Access", "label": "Day 1 sessions", "from": "day:d1", "tiers": { "day1": "yes", "day2": "no", "full": "yes", "vip": "yes" } },
+      { "id": "r-d2", "group": "Access", "label": "Day 2 sessions", "from": "day:d2", "tiers": { "day1": "no", "day2": "yes", "full": "yes", "vip": "yes" } },
+      { "id": "r-ws", "group": "Access", "label": "Workshops and studio", "from": "track:studio", "tiers": { "day1": "no", "day2": "no", "full": "yes", "vip": "yes" } },
+      { "id": "r-lunch", "group": "Extras", "label": "Lunch", "detail": "[PLACEHOLDER] Lunch both days in the main hall.", "tiers": { "day1": "no", "day2": "no", "full": "yes", "vip": "yes" } },
+      { "id": "r-dinner", "group": "Extras", "label": "Speaker dinner", "from": "session:s107", "tiers": { "day1": "no", "day2": "no", "full": "no", "vip": "yes" } },
+      { "id": "r-seat", "group": "Extras", "label": "Reserved seating", "detail": "[PLACEHOLDER] First three rows at every Main Stage session.", "tiers": { "day1": "no", "day2": "no", "full": "no", "vip": "Front rows" } }
+    ],
+    "footnote": "[PLACEHOLDER] Prices include fees. Refunds until 7 days before."
+  },
+
+  "sponsors": {
+    "heading": "Sponsors",
+    "tiers": [
+      { "name": "Presented by", "items": [{ "name": "Sponsor One", "logo": "", "link": "" }] },
+      { "name": "Partners", "items": [{ "name": "Sponsor Two", "logo": "", "link": "" }, { "name": "Sponsor Three", "logo": "", "link": "" }, { "name": "Sponsor Four", "logo": "", "link": "" }] }
+    ]
+  },
+
+  "venue": {
+    "heading": "Getting there",
+    "intro": "[PLACEHOLDER] One line on the venue and the best way to arrive.",
+    "mapLink": "",
+    "items": [
+      { "title": "Address", "body": "[PLACEHOLDER] 123 Sample St, City, ST 00000." },
+      { "title": "Transit", "body": "[PLACEHOLDER] Nearest station and walk time." },
+      { "title": "Parking", "body": "[PLACEHOLDER] Where, and what it costs." },
+      { "title": "Check-in", "body": "[PLACEHOLDER] Where to go first and what to bring." },
+      { "title": "Accessibility", "body": "[PLACEHOLDER] Step-free access, seating, and who to contact." }
+    ]
+  },
+
+  "registration": {
+    "heading": "Register",
+    "intro": "[PLACEHOLDER] One line.",
+    "demoNotice": "Demo form. Nothing is sent anywhere.",
+    "extraFields": [
+      { "id": "org", "label": "Company or school", "type": "text", "required": false },
+      { "id": "access", "label": "Access needs", "type": "textarea", "required": false, "hint": "Anything we should plan for." }
+    ],
+    "confirmation": "[PLACEHOLDER] What happens next: confirmation email, where to check in."
+  },
+
+  "faq": {
+    "heading": "FAQ",
+    "items": [
+      { "q": "[PLACEHOLDER] Can I transfer my ticket?", "a": "[PLACEHOLDER] Answer." },
+      { "q": "[PLACEHOLDER] Is there a dress code?", "a": "[PLACEHOLDER] Answer." },
+      { "q": "[PLACEHOLDER] Will sessions be recorded?", "a": "[PLACEHOLDER] Answer." },
+      { "q": "[PLACEHOLDER] What is the refund policy?", "a": "[PLACEHOLDER] Answer." }
+    ]
+  }
+}
