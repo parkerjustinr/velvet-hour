@@ -308,6 +308,101 @@
     }).join("") + "</div>");
   };
 
+  // ---------- hero moment: light-up dance floor ----------
+  // Diagonal bands of light chase across the floor in the three track colors.
+  // Squares under the cursor or finger light up; on phones, scrolling moves the chase.
+  // Reduced motion: one still lit frame, no chase, no tracking.
+  function danceFloor() {
+    var host = $("hero-moment"), hero = $("top");
+    if (!host || !hero) return;
+    var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var floor = document.createElement("div");
+    floor.className = "floor";
+    host.appendChild(floor);
+    var GAP = 3, cells = [], cols = 0, rows = 0, pitch = 0, tick = 0, scrollStep = 0, timer = null, onScreen = true, lastCell = null, hue = 0;
+
+    function build() {
+      var size = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cell")) || 44;
+      pitch = size + GAP;
+      var c = Math.ceil(host.clientWidth / pitch) + 1, r = Math.ceil(host.clientHeight / pitch) + 1;
+      if (c === cols && r === rows) return;
+      cols = c; rows = r;
+      floor.style.setProperty("--cols", cols);
+      floor.innerHTML = new Array(cols * rows + 1).join("<i></i>");
+      cells = floor.children;
+      paint();
+    }
+    function paint() {
+      var phase = tick + scrollStep, now = Date.now();
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          var el = cells[r * cols + c];
+          if (el._until > now) continue;
+          var d = c + r - phase, m = ((d % 7) + 7) % 7, band = Math.floor(d / 7);
+          var lit = m === 0 || (still && m === 3) || ((c * 31 + r * 17 + phase * 7) % 23 === 0);
+          el.className = lit ? "l" + ((((band + (m === 3 ? 1 : 0)) % 3) + 3) % 3 + 1) : "";
+        }
+      }
+    }
+    function lightAt(x, y) {
+      var rect = host.getBoundingClientRect();
+      var c = Math.floor((x - rect.left - GAP) / pitch), r = Math.floor((y - rect.top - GAP) / pitch);
+      if (c < 0 || r < 0 || c >= cols || r >= rows) return;
+      var el = cells[r * cols + c];
+      if (el === lastCell) return;
+      lastCell = el;
+      var h = hue = hue % 3 + 1;
+      el._until = Date.now() + 700;
+      el.className = "l" + h + " hot";
+      setTimeout(function () { el.className = "l" + h; }, 120);
+    }
+    function start() { if (!timer && !still && onScreen && !document.hidden) timer = setInterval(function () { tick++; paint(); }, 560); }
+    function stop() { clearInterval(timer); timer = null; }
+
+    build();
+    var resizeT;
+    window.addEventListener("resize", function () { clearTimeout(resizeT); resizeT = setTimeout(build, 150); });
+    if (still) return;
+    start();
+    hero.addEventListener("pointermove", function (e) { lightAt(e.clientX, e.clientY); });
+    hero.addEventListener("touchmove", function (e) { var t = e.touches[0]; if (t) lightAt(t.clientX, t.clientY); }, { passive: true });
+    var queued = false;
+    window.addEventListener("scroll", function () {
+      if (!onScreen || queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        var s = Math.floor(window.scrollY / 40);
+        if (s !== scrollStep) { scrollStep = s; paint(); }
+      });
+    }, { passive: true });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { onScreen = en[0].isIntersecting; if (onScreen) start(); else stop(); }).observe(hero);
+    }
+  }
+
+  // ---------- scene changes ----------
+  // Each section is a scene. When it scrolls into view, a band of its stage light sweeps across the top once.
+  // Sections re-rendered later (time zone toggle, form reset) keep their light without sweeping again.
+  var litScenes = {}, sceneIO = null;
+  function lightScenes() {
+    var secs = document.querySelectorAll("#sections > .section");
+    if (!("IntersectionObserver" in window)) { Array.prototype.forEach.call(secs, function (s) { s.classList.add("is-lit"); }); return; }
+    sceneIO = sceneIO || new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("is-lit");
+        litScenes[e.target.id] = true;
+        sceneIO.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -20% 0px" });
+    Array.prototype.forEach.call(secs, function (s) {
+      if (litScenes[s.id]) s.classList.add("is-lit", "is-held");
+      else sceneIO.observe(s);
+    });
+  }
+
   // ---------- wiring ----------
   function wireTabs() {
     var root = $("schedule");
@@ -421,7 +516,7 @@
     $("reg-again").addEventListener("click", function () {
       var sec = $("register");
       sec.outerHTML = R.register();
-      wireForm();
+      wireForm(); lightScenes();
       $("f-name").focus();
     });
   }
@@ -434,7 +529,7 @@
       var old = $(id);
       if (old && R[id]) old.outerHTML = R[id]();
     });
-    wireTabs(); wireMatrix();
+    wireTabs(); wireMatrix(); lightScenes();
     if (selId && $(selId)) selectTab($(selId), false);
   }
 
@@ -504,6 +599,7 @@
       renderHero();
       renderChrome();
       wireTabs(); wireMatrix(); wireForm(); wireGlobal();
+      danceFloor(); lightScenes();
       if (location.hash.length > 1) {
         var target = $(location.hash.slice(1));
         if (target) target.scrollIntoView();
