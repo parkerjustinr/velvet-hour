@@ -14,6 +14,17 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
+  <!-- Warm duotone for lineup photos: plum shadows, gold highlights. -->
+  <svg class="sr" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="duotone" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.741" intercept="0.169"/>
+        <feFuncG type="linear" slope="0.651" intercept="0.055"/>
+        <feFuncB type="linear" slope="0.153" intercept="0.145"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
   <p class="notice" role="note" id="notice" hidden></p>
 
   <header class="site-header">

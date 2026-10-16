@@ -13,7 +13,8 @@
     "pageTitle": "Velvet Hour 2026 - The Anthem, Washington, DC",
     "description": "Velvet Hour: a two-night live-band soul and funk revue at The Anthem, Washington, DC, Nov 20 and 21, 2026.",
     "placeholderNotice": "Fictional event. Every performer, song, time and price on this page is invented.",
-    "footerLine": "Fictional event made for the Happily Design Jam."
+    "footerLine": "Fictional event made for the Happily Design Jam.",
+    "creditLine": "Photos: Unsplash"
   },
 
   "sections": [
@@ -65,13 +66,14 @@
     "intro": "One headliner, one opener who comes back for a duet, a band built for stamina, and a different DJ each night.",
     "linksLabel": "Set times",
     "items": [
-      {"id": "rio", "name": "Rio Delacroix", "role": "Headliner", "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.", "photo": "", "link": ""},
-      {"id": "june", "name": "June Halloway", "role": "Opener, and a different duet each night", "bio": "", "photo": "", "link": ""},
-      {"id": "theo", "name": "Theo Okafor", "role": "Band leader and keys, The Chrome Section", "bio": "", "photo": "", "link": ""},
-      {"id": "brass", "name": "The Brass Satellites", "role": "Horn section: two trumpets, tenor sax, trombone", "bio": "", "photo": "", "link": ""},
-      {"id": "polyester", "name": "DJ Polyester", "role": "DJ, Fri - Slow Burn and the Friday afterparty", "bio": "", "photo": "", "link": ""},
-      {"id": "lavalamp", "name": "DJ Lava Lamp", "role": "DJ, Sat - Full Funk and the Saturday afterparty", "bio": "", "photo": "", "link": ""},
-      {"id": "bobbie", "name": "Bobbie Dazzle", "role": "Host, Heart Cam and Dance Cam ringleader", "bio": "", "photo": "", "link": ""}
+      {"id": "rio", "name": "Rio Delacroix", "role": "Headliner", "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.", "photo": "img/lineup/rio.jpg", "link": "", "alt": "Rio Delacroix singing into a microphone on a smoky stage"},
+      {"id": "june", "name": "June Halloway", "role": "Opener, and a different duet each night", "bio": "", "photo": "img/lineup/june.jpg", "link": "", "alt": "June Halloway singing into a microphone"},
+      {"id": "theo", "name": "Theo Okafor", "role": "Band leader and keys, The Chrome Section", "bio": "", "photo": "img/lineup/theo.jpg", "link": "", "alt": "Theo Okafor playing keys and singing on stage"},
+      {"id": "brass", "name": "The Brass Satellites", "role": "Horn section: two trumpets, tenor sax, trombone", "bio": "", "photo": "img/lineup/brass.jpg", "link": "", "alt": "The Brass Satellites' sax player blowing a solo on stage"},
+      {"id": "polyester", "name": "DJ Polly Ester", "role": "DJ, Fri - Slow Burn and the Friday afterparty", "bio": "", "photo": "img/lineup/polyester.jpg", "link": "", "alt": "DJ Polly Ester at the decks with headphones around the neck"},
+      {"id": "lavalamp", "name": "DJ Lola Lava", "role": "DJ, Sat - Full Funk and the Saturday afterparty", "bio": "", "photo": "img/lineup/lavalamp.jpg", "link": "", "alt": "DJ Lola Lava mixing with headphones on"},
+      {"id": "bobbie", "name": "Bobbie Dazzle", "role": "Host, Heart Cam and Dance Cam ringleader", "bio": "", "photo": "img/lineup/bobbie.jpg", "link": "", "alt": "Bobbie Dazzle in a black suit and sunglasses, adjusting a tie"},
+      {"id": "guest", "name": "Surprise guest", "role": "Sat - Full Funk only. Name not announced.", "bio": "", "photo": "img/lineup/guest.svg", "alt": "A plum silhouette with a gold question mark", "plain": true, "link": ""}
     ]
   },
 
@@ -120,7 +122,7 @@
           {"id": "n2-s2", "start": "21:50", "end": "22:10", "title": "Scene: The Funk Breakdown", "track": "stage", "speakers": ["rio", "theo", "brass"], "detail": "Bass and horns trade breaks on \"Platform Shoes Required\".", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
           {"id": "n2-duet", "start": "22:10", "end": "22:20", "title": "Duet: June Halloway, uptempo", "track": "stage", "speakers": ["rio", "june"], "detail": "June returns for a fast one, \"Roller Rink Royalty\".", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
           {"id": "n2-off", "start": "22:20", "end": "22:35", "title": "Dance Cam dance-off", "track": "floor", "speakers": ["bobbie", "lavalamp"], "detail": "Bobbie Dazzle picks dancers from the floor and the balcony. The room votes by noise.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
-          {"id": "n2-guest", "start": "22:35", "end": "22:45", "title": "Surprise guest", "track": "stage", "speakers": [], "detail": "Saturday only. One name we are not printing.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
+          {"id": "n2-guest", "start": "22:35", "end": "22:45", "title": "Surprise guest", "track": "stage", "speakers": ["guest"], "detail": "Saturday only. One name we are not printing.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
           {"id": "n2-s3", "start": "22:45", "end": "23:00", "title": "Scene: The Mirror Ball", "track": "stage", "speakers": ["rio", "theo"], "detail": "The light-up floor takes over and the whole room dances.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
           {"id": "n2-finale", "start": "23:00", "end": "23:10", "title": "Finale: Gold confetti cannons", "track": "stage", "speakers": ["rio", "brass"], "detail": "Sixteen cannons of gold confetti over the whole room, balcony included.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
           {"id": "n2-encore", "start": "23:15", "end": "23:30", "title": "Encore", "track": "stage", "speakers": ["rio", "theo", "brass"], "detail": "Different every night.", "tiers": ["balcony", "floor", "rail", "vip", "both"]},
@@ -183,7 +185,7 @@
     "liveTally": "Live",
     "demoTally": "Demo",
     "who": "Now on the floor: You",
-    "demoWho": "Now on the floor: Demo dancer",
+    "demoWho": "Now on the floor: June Halloway (demo)",
     "effects": [
       {"id": "mirrorball", "label": "Mirror Ball"},
       {"id": "heart", "label": "Heart Cam"},
@@ -202,11 +204,13 @@
     "polaroidText": "Velvet Hour, Nov 2026",
     "privacy": "Nothing is recorded, uploaded or sent anywhere. The picture is made in your browser and stays on your device. A snapshot is only kept if you press Save, and it saves to your own device.",
     "liveLine": "You're on the Dance Cam. The picture stays on this device.",
-    "offLine": "Camera off. The demo dancer is back on the floor.",
+    "offLine": "Camera off. June Halloway is back on the floor in demo mode.",
     "awayLine": "Camera turned off when you scrolled away. Press the button to come back on.",
-    "fallbackLine": "No camera today? No problem. The demo dancer is on the floor, and every effect still works.",
+    "fallbackLine": "No camera today? No problem. June Halloway is on the floor in demo mode, and every effect still works.",
     "snapLine": "Snapshot ready. Save it to your device, or close it.",
-    "captions": ["Show us your best move", "Front row energy", "Who taught you that?", "Velvet Hour, are you ready?", "Biggest smile in the building", "Now do it in slow motion", "Somebody get this dancer a spotlight"]
+    "captions": ["Show us your best move", "Front row energy", "Who taught you that?", "Velvet Hour, are you ready?", "Biggest smile in the building", "Now do it in slow motion", "Somebody get this dancer a spotlight"],
+    "demoPhoto": "img/lineup/june.jpg",
+    "demoFocus": [0.5, 0.36]
   },
 
   "registration": {

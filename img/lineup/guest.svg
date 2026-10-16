@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <rect width="800" height="1000" fill="#1c0718"/>
+  <circle cx="400" cy="380" r="150" fill="#4a1d40"/>
+  <path d="M120 1000 C120 760 240 610 400 610 C560 610 680 760 680 1000 Z" fill="#4a1d40"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="300" fill="#e8b44c">?</text>
+</svg>

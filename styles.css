@@ -188,9 +188,12 @@ main:focus { outline: none; }
 
 /* ---------- lineup: headliner marquee, then nameplates ---------- */
 .sp-featured { display: grid; gap: 20px; margin: 8px 0 40px; border: 3px solid var(--chrome); padding: 16px; background: var(--bg-2); }
-.sp-featured .sp-photo { aspect-ratio: 4 / 5; width: 100%; max-width: 420px; }
+.sp-featured .sp-photo { width: 100%; max-width: 420px; }
 .sp-featured .sp-name { font-size: clamp(2.3rem, 9vw, 4rem); margin-top: 0; }
-.sp-photo { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--bg); border: var(--rule); }
+.sp-photo { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; background: var(--bg); border: var(--rule); }
+/* Same treatment on every photo: warm duotone at rest, full color on hover or keyboard focus. */
+.sp-photo.is-duotone { filter: url(#duotone); }
+.sp-featured:hover .sp-photo, .sp-featured:focus-within .sp-photo, .sp-card:hover .sp-photo, .sp-card:focus-within .sp-photo { filter: none; }
 .sp-initials { display: grid; place-items: center; font-family: var(--display); font-size: 2.4rem; color: var(--chrome); }
 .sp-featured .sp-initials { font-size: clamp(4rem, 18vw, 7rem); color: var(--fg); }
 .sp-name { font-size: 1.4rem; margin: 12px 0 2px; }
@@ -203,13 +206,12 @@ main:focus { outline: none; }
 .sp-sessions .t { font-weight: 700; }
 .sp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 16px; }
 .sp-card { border-top: 3px solid var(--chrome); padding-top: 12px; }
-.sp-card .sp-photo { aspect-ratio: 3 / 2; }
 @media (min-width: 720px) {
   .sp-featured { grid-template-columns: minmax(240px, 360px) 1fr; gap: 32px; padding: 24px; }
   .sp-featured .sp-sessions { columns: 2; column-gap: 24px; }
   .sp-grid { grid-template-columns: repeat(3, 1fr); }
 }
-@media (min-width: 1040px) { .sp-grid { grid-template-columns: repeat(6, 1fr); } }
+@media (min-width: 1040px) { .sp-grid { grid-template-columns: repeat(4, 1fr); gap: 36px 24px; } }
 
 /* ---------- dance cam: TV studio jumbotron ---------- */
 .cam { display: grid; gap: 20px; }
@@ -419,6 +421,7 @@ td.is-sel .yes { color: var(--gold); }
 .footer-links a { text-decoration: none; }
 .footer-links a:hover { text-decoration: underline; }
 .footer-small { font-size: 0.95rem; color: var(--muted); margin: 0; }
+.footer-credit { font-size: 0.8rem; color: var(--muted); margin: 0; }
 
 section[id] { scroll-margin-top: 100px; }
 @media (min-width: 960px) { section[id] { scroll-margin-top: 70px; } }

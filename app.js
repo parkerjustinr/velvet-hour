@@ -150,9 +150,11 @@
         return '<li><a href="#session-' + x.s.id + '"><span class="t" data-start="' + x.day.id + "|" + x.s.id + '">' + esc(x.day.label) + ", " + esc(fmtTime(t.start)) + "</span> " + esc(x.s.title) + "</a></li>";
       }).join("") + "</ul>";
     }
+    // Photos are cropped 4:5 at 800x1000. They show in a warm duotone and go full color on hover or focus.
     function photo(p, cls) {
       return p.photo
-        ? '<img class="' + cls + '" src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy">'
+        ? '<img class="' + cls + (p.plain ? "" : " is-duotone") + '" src="' + esc(p.photo) + '" alt="' + esc(p.alt || p.name) +
+          '" width="800" height="1000" loading="lazy" decoding="async">'
         : '<div class="' + cls + ' sp-initials" aria-hidden="true">' + esc(initials(p.name)) + "</div>";
     }
     var first = sp.items[0], rest = sp.items.slice(1);
@@ -537,10 +539,26 @@
       g.fillStyle = COL.deep; g.fillRect(388, 58, 10, 20);
       g.fillStyle = COL.chrome; g.beginPath(); g.arc(393, 56, 8, 0, Math.PI * 2); g.fill();
     })(dancer.getContext("2d"));
+    // The demo picture is a lineup photo (dancecam.demoPhoto), cover-cropped around demoFocus with a gentle
+    // bounce. The illustrated dancer stands in until the photo loads, or if it cannot load.
+    var photo = new Image(), photoReady = false;
+    if (c.demoPhoto) {
+      photo.onload = function () { photoReady = true; kick(); };
+      photo.src = c.demoPhoto;
+    }
     function demoFrame(t) {
-      var g = demo.getContext("2d");
+      var g = demo.getContext("2d"), bounce = still ? 0 : Math.abs(Math.sin(t * 2.6)) * 8 * K;
+      if (photoReady) {
+        var f = c.demoFocus || [0.5, 0.5];
+        var s = Math.max(W / photo.naturalWidth, H / photo.naturalHeight) * 1.04, dw = photo.naturalWidth * s, dh = photo.naturalHeight * s;
+        var x = Math.min(0, Math.max(W - dw, W / 2 - dw * f[0]));
+        var y = Math.min(0, Math.max(H - dh + 10 * K, H / 2 - dh * f[1]));
+        g.fillStyle = COL.deep; g.fillRect(0, 0, W, H);
+        g.drawImage(photo, x, y - bounce, dw, dh);
+        return demo;
+      }
       g.drawImage(stage, 0, 0);
-      g.drawImage(dancer, 0, still ? 0 : -Math.abs(Math.sin(t * 2.6)) * 8 * K);
+      g.drawImage(dancer, 0, -bounce);
       return demo;
     }
 
@@ -998,7 +1016,8 @@
     $("footer").innerHTML = '<div class="wrap footer-inner"><p class="footer-word" aria-hidden="true">' + esc(m.name) + "</p>" +
       '<nav aria-label="Footer"><ul class="footer-links">' + on.map(function (s) { return '<li><a href="#' + s.id + '">' + esc(s.label) + "</a></li>"; }).join("") + "</ul></nav>" +
       '<p class="footer-small">' + esc(m.dates) + " / " + esc(m.venue) + ", " + esc(m.city) + "</p>" +
-      '<p class="footer-small">' + esc(m.footerLine || "") + "</p></div>";
+      '<p class="footer-small">' + esc(m.footerLine || "") + "</p>" +
+      (m.creditLine ? '<p class="footer-credit">' + esc(m.creditLine) + "</p>" : "") + "</div>";
   }
 
   function showError(err) {
