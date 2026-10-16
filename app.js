@@ -62,11 +62,11 @@
   function icsText(v) { return String(v || "").replace(/\[PLACEHOLDER\]\s?/g, "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n"); }
   function downloadIcs(days, filename) {
     var loc = [D.meta.venue, D.meta.address].filter(Boolean).join(", ");
-    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Event Kit//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Velvet Hour//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
     days.forEach(function (day) {
       day.sessions.forEach(function (s) {
         var t = sessionTimes(day, s);
-        lines.push("BEGIN:VEVENT", "UID:" + s.id + "-" + D.meta.year + "@event-kit", "DTSTAMP:" + icsStamp(new Date()),
+        lines.push("BEGIN:VEVENT", "UID:" + s.id + "-" + D.meta.year + "@velvet-hour", "DTSTAMP:" + icsStamp(new Date()),
           "DTSTART:" + icsStamp(t.start), "DTEND:" + icsStamp(t.end), "SUMMARY:" + icsText(D.meta.name + ": " + s.title),
           "DESCRIPTION:" + icsText(s.detail), "LOCATION:" + icsText(loc), "END:VEVENT");
       });
@@ -290,7 +290,7 @@
     var head = '<thead><tr><td class="m-corner"></td>' + t.tiers.map(function (tier) {
       return '<th scope="col" class="m-col c-' + tier.id + (tier.id === t.recommended ? " is-rec" : "") + '"><label class="m-pick">' +
         '<input type="radio" name="tier" value="' + tier.id + '"' + (tier.id === state.tier ? " checked" : "") + ">" +
-        (tier.id === t.recommended ? '<span class="m-rec">Most picked</span>' : "") +
+        (tier.id === t.recommended ? '<span class="m-rec">Best value</span>' : "") +
         '<span class="m-name">' + esc(tier.name) + '</span><span class="m-price">' + esc(tier.price) + '</span><span class="m-note">' + esc(tier.note || "") + "</span></label></th>";
     }).join("") + "</tr></thead>";
     var lastGroup = null, body = "";
@@ -1184,7 +1184,7 @@
     var r = D.registration, days = daysForTier(rec.tier.id);
     $("reg-out").innerHTML =
       '<div class="confirm" role="status" tabindex="-1" id="reg-confirm">' +
-        '<p class="confirm-kicker">Demo confirmation</p><h3>You\'re registered.</h3>' +
+        '<h3>You\'re registered.</h3><p class="confirm-demo">Demo confirmation. Nothing was sent anywhere.</p>' +
         '<dl class="confirm-dl"><dt>Name</dt><dd>' + esc(rec.name) + "</dd><dt>Email</dt><dd>" + esc(rec.email) +
         "</dd><dt>Ticket</dt><dd>" + esc(rec.tier.name) + ", " + esc(rec.tier.price) + "</dd></dl>" +
         "<p>" + copy(r.confirmation) + "</p>" +

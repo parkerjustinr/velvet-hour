@@ -30,7 +30,7 @@
 
   "hero": {
     "title": ["Velvet", "Hour"],
-    "sub": "A live-band soul and funk revue built to get the whole room dancing. Two nights at The Anthem, a twelve-piece band, and a show where the crowd is part of the act.",
+    "sub": "A live-band soul and funk revue built to get the whole room dancing. A twelve-piece band plays The Anthem for two nights, and the crowd is part of the act.",
     "primaryCta": {
       "label": "Get tickets",
       "href": "#tickets"
@@ -50,7 +50,7 @@
   },
 
   "about": {
-    "heading": "Two nights, two shows, and the crowd is part of both",
+    "heading": "Two nights, two different shows, and you're part of both",
     "paragraphs": ["Rio Delacroix does not let up. Friday is Slow Burn: candlelight, quiet-storm ballads, June Halloway's ballad duet, the Heart Cam during the slow jam, and one last slow dance under the mirror ball.", "Saturday is Full Funk: the horn section up front, a surprise guest, a Dance Cam dance-off, gold confetti cannons over the whole room and an afterparty until 2 AM. Two setlists, and no song is played twice. Come to one night or both; either way, you will not be watching from the outside."]
   },
 
@@ -69,12 +69,12 @@
         "id": "rio",
         "name": "Rio Delacroix",
         "role": "Headliner",
-        "bio": "Singer, dancer and bandleader-in-chief. Rio runs a two-hour revue without a single sit-down moment, and the encore is never the same twice.",
+        "bio": "Rio leads the band from the front of the stage and runs a two-hour revue without a single sit-down moment. The encore is never the same twice.",
         "photo": "img/lineup/rio.jpg",
         "link": "",
         "alt": "Rio Delacroix singing into a microphone on a smoky stage",
         "style": "Soul and funk showman / New Orleans, LA",
-        "about": "Rio Delacroix learned to work a room at a family supper club and never learned to stand still. Two hours, no sit-down moment, a horn hit for every spin. Every night ends with an encore that has never been played the same way twice.",
+        "about": "Rio Delacroix learned to work a room at a family supper club and never learned to stand still. Expect a horn hit for every spin. Every night ends with an encore that has never been played the same way twice.",
         "audio": {
           "src": "audio/rio.mp3",
           "title": "Velvet Ultimatum",
@@ -291,7 +291,7 @@
 
   "dancecam": {
     "heading": "Dance Cam",
-    "intro": "On the night, the Dance Cam roams the floor and the balcony and puts you on the big screen. Try the broadcast here first: pick an effect, step on the floor, take a snapshot.",
+    "intro": "On the night, the Dance Cam roams the floor and the balcony and puts you on the big screen. Try the broadcast here first: turn on your camera or watch the demo, then pick an effect.",
     "bug": "Velvet Hour Dance Cam",
     "liveTally": "Live",
     "demoTally": "Demo",
