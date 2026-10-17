@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#2b0e25">
+  <title>Velvet Hour - A two-night soul and funk revue, Washington DC</title>
+  <meta name="description" content="Two nights of live-band soul and funk at The Anthem on DC's Wharf: Slow Burn on Fri, Nov 20 and Full Funk on Sat, Nov 21, 2026. A fictional event for the Happily Design Jam.">
+  <!-- Frozen snapshot of the judged Happily Design Jam version. Never edit anything inside jam-winner/. -->
+  <!-- Link preview card. Share crawlers need absolute URLs: these assume GitHub Pages at https://parkerjustinr.github.io/velvet-hour/jam-winner/ -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://parkerjustinr.github.io/velvet-hour/jam-winner/">
+  <meta property="og:title" content="Velvet Hour - A two-night soul and funk revue, Washington DC">
+  <meta property="og:description" content="Two nights of live-band soul and funk at The Anthem on DC's Wharf: Slow Burn on Fri, Nov 20 and Full Funk on Sat, Nov 21, 2026. A fictional event for the Happily Design Jam.">
+  <meta property="og:image" content="https://parkerjustinr.github.io/velvet-hour/jam-winner/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Velvet Hour title over a light-up dance floor in tangerine, magenta and teal">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- FONTS: Shrikhand (display) + Figtree (body). Keep one display face + one body face. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&family=Shrikhand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <!-- Warm duotone for lineup photos: plum shadows, gold highlights. -->
+  <svg class="sr" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="duotone" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.741" intercept="0.169"/>
+        <feFuncG type="linear" slope="0.651" intercept="0.055"/>
+        <feFuncB type="linear" slope="0.153" intercept="0.145"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  <p class="notice" role="note" id="notice" hidden></p>
+
+  <header class="site-header">
+    <a class="brand" href="#top" id="brand"></a>
+    <nav aria-label="Sections"><ul class="nav-list" id="nav"></ul></nav>
+    <a class="btn btn-primary btn-small header-cta" href="#tickets" id="header-cta">Tickets</a>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <!-- HERO MOMENT: the one "slightly too much" element goes in #hero-moment. -->
+      <div class="hero-moment" id="hero-moment" aria-hidden="true"></div>
+      <div class="hero-inner" id="hero"></div>
+    </section>
+    <section class="marquee" id="marquee" aria-label="Performers"></section>
+    <div id="sections"></div>
+    <noscript><p class="wrap">This page loads its content with JavaScript. Please turn JavaScript on.</p></noscript>
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+  <script src="app.js" defer></script>
+</body>
+</html>

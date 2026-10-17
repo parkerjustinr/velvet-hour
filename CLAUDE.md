@@ -14,6 +14,7 @@ One-page event site. Plain HTML, CSS, vanilla JS. No framework, no build step. D
 - `styles.css` - design tokens at the top of `:root`. Change tokens first, then section styles.
 - `app.js` - one renderer per section in the `R` object. To add a section: add a renderer `R.<id>`, then add `{ "id": "<id>", "label": "...", "on": true }` to `sections`.
 - `#hero-moment` in `index.html` is reserved for the one big hero element.
+- jam-winner/ is a frozen snapshot of the judged version. Never edit anything inside it.
 
 ## Built-in features (keep them working)
 - Featured speaker plus grid. Speakers link to their sessions and sessions link back, switching the day tab if needed.
