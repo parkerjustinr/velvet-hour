@@ -141,15 +141,7 @@
   };
 
   R.speakers = function () {
-    var sp = D.speakers, map = speakerSessions();
-    function sessionLinks(id) {
-      var list = map[id] || [];
-      if (!list.length) return "";
-      return '<ul class="sp-sessions" aria-label="' + esc(sp.linksLabel || "Sessions") + '">' + list.map(function (x) {
-        var t = sessionTimes(x.day, x.s);
-        return '<li><a href="#session-' + x.s.id + '"><span class="t" data-start="' + x.day.id + "|" + x.s.id + '">' + esc(x.day.label) + ", " + esc(fmtTime(t.start)) + "</span> " + esc(x.s.title) + "</a></li>";
-      }).join("") + "</ul>";
-    }
+    var sp = D.speakers;
     // Photos are cropped 4:5 at 800x1000. They show in a warm duotone and go full color on hover or focus.
     function photo(p, cls) {
       return p.photo
@@ -168,11 +160,11 @@
     var first = sp.items[0], rest = sp.items.slice(1);
     var featured = first ? '<article class="sp-featured sp-hit" data-artist="' + esc(first.id) + '" id="speaker-' + first.id + '">' + media(first) +
       '<div class="sp-body"><h3 class="sp-name">' + nameButton(first) + '</h3><p class="sp-role">' + esc(first.role) + "</p>" +
-      '<p class="sp-bio">' + copy(first.bio) + "</p>" + sessionLinks(first.id) + "</div></article>" : "";
+      '<p class="sp-bio">' + copy(first.bio) + "</p></div></article>" : "";
     var grid = '<ul class="sp-grid">' + rest.map(function (p) {
       return '<li class="sp-card sp-hit" data-artist="' + esc(p.id) + '" id="speaker-' + p.id + '">' + media(p) +
         '<h3 class="sp-name">' + nameButton(p) + "</h3>" +
-        '<p class="sp-role">' + esc(p.role) + "</p>" + sessionLinks(p.id) + "</li>";
+        '<p class="sp-role">' + esc(p.role) + "</p></li>";
     }).join("") + "</ul>";
     return sectionShell("speakers", sp.heading, (sp.intro ? '<p class="lede">' + copy(sp.intro) + "</p>" : "") + featured + grid);
   };
@@ -204,11 +196,21 @@
         '<div class="cam-shot" id="cam-shot" hidden>' +
             '<img class="polaroid" id="cam-shot-img" alt="' + esc(c.snapAlt) + '">' +
             '<div class="cam-shot-actions"><a class="btn btn-primary" id="cam-save" href="#" download="velvet-hour-dance-cam.png">' + esc(c.saveLabel) + "</a>" +
+            (D.invite ? '<button type="button" class="btn" data-invite-open="photo">' + esc(D.invite.camButton) + "</button>" : "") +
             '<button type="button" class="btn" id="cam-shot-close">' + esc(c.closeLabel) + "</button></div>" +
             '<p class="hint">' + copy(c.saveHint) + "</p>" +
         "</div>" +
       "</div>");
   };
+
+  // A 32px round crop of a lineup photo, zoomed on the face (speakers.items[].face = [x, y, zoom]).
+  function face(p) {
+    var f = p.face || [0.5, 0.3, 2.5], z = f[2], zy = z * 1.25;
+    var px = z > 1 ? Math.max(0, Math.min(100, (f[0] * z - 0.5) / (z - 1) * 100)) : 50;
+    var py = zy > 1 ? Math.max(0, Math.min(100, (f[1] * zy - 0.5) / (zy - 1) * 100)) : 50;
+    return '<span class="s-face' + (p.plain ? "" : " is-duotone") + '" data-artist="' + esc(p.id) + '" style="background-image:url(' + esc(p.photo) +
+      ");background-size:" + Math.round(z * 100) + "% auto;background-position:" + px.toFixed(1) + "% " + py.toFixed(1) + '%"></span>';
+  }
 
   R.schedule = function () {
     var s = D.schedule;
@@ -233,10 +235,12 @@
         : '<div class="day-panel" role="tabpanel" id="panel-' + day.id + '" aria-labelledby="tab-' + day.id + '"' + (i ? " hidden" : "") + ' tabindex="0">') +
         '<ol class="sessions">' + sorted.map(function (x) {
           var t = sessionTimes(day, x), tr = byId(D.tracks, x.track);
-          var spk = (x.speakers || []).map(function (id) {
-            var p = byId(D.speakers.items, id);
-            return p ? '<a href="#speaker-' + id + '">' + esc(p.name) + "</a>" : "";
-          }).filter(Boolean).join(", ");
+          // Performers: small round faces (overlapping when there are several), then names. Both open the artist popup.
+          var people = (x.speakers || []).map(function (id) { return byId(D.speakers.items, id); }).filter(Boolean);
+          var spk = people.length ? '<span class="s-faces" aria-hidden="true">' + people.filter(function (p) { return p.photo; }).map(face).join("") + "</span>" +
+            '<span class="s-names">' + people.map(function (p) {
+              return '<button type="button" class="s-person" data-artist="' + esc(p.id) + '" aria-haspopup="dialog">' + esc(p.name) + "</button>";
+            }).join(", ") + "</span>" : "";
           return '<li class="session track-' + trackIndex(x.track) + '" id="session-' + x.id + '">' +
             '<span class="s-time"><time datetime="' + t.start.toISOString() + '">' + esc(t.label) + "</time></span>" +
             '<div class="s-body"><h3 class="s-title">' + esc(x.title) + "</h3>" +
@@ -315,6 +319,7 @@
       (t.intro ? '<p class="lede">' + copy(t.intro) + "</p>" : "") +
       '<fieldset class="matrix-wrap"><legend class="sr">Choose a ticket</legend><div class="matrix-layout">' + table + preview + "</div></fieldset>" +
       '<div class="matrix-cta"><a class="btn btn-primary" href="#register" id="tier-cta"></a>' +
+      (D.invite ? '<p class="gift-line">' + esc(D.invite.ticketsLine) + ' <button type="button" class="gift-link" data-invite-open="gift">' + esc(D.invite.ticketsLink) + "</button></p>" : "") +
       (t.footnote ? '<p class="note">' + copy(t.footnote) + "</p>" : "") + "</div>");
   };
 
@@ -776,6 +781,7 @@
         $("cam-shot").hidden = false;
         status(c.snapLine);
         $("cam-save").focus();
+        setInvitePhoto(blob);
       }, "image/png");
     });
     $("cam-shot-close").addEventListener("click", function () {
@@ -1037,9 +1043,17 @@
       audio.load();
     }
 
-    // Open from anywhere on a lineup card, except its own set-time links.
+    // Open from anywhere on a lineup card, or from a performer's name or face in the run of show.
+    // Focus returns to the name button.
     document.addEventListener("click", function (e) {
-      var hit = e.target.closest && e.target.closest(".sp-hit");
+      if (!e.target.closest) return;
+      var person = e.target.closest(".s-person, .s-face");
+      if (person) {
+        var pid = person.getAttribute("data-artist");
+        open(pid, person.classList.contains("s-person") ? person : person.closest(".s-body").querySelector('.s-person[data-artist="' + pid + '"]'));
+        return;
+      }
+      var hit = e.target.closest(".sp-hit");
       if (!hit || e.target.closest("a")) return;
       open(hit.getAttribute("data-artist"), hit.querySelector(".sp-open"));
     });
@@ -1081,6 +1095,237 @@
       if (!jumping && opener && document.contains(opener)) opener.focus();
       jumping = false;
     });
+  }
+
+  // ---------- "Bring someone" invite builder ----------
+  // A demo: nothing is sent. Three steps in one <dialog>: build, preview (the email as it would land on a
+  // phone), sent. Opened from the registration confirmation, the Tickets section and the Dance Cam.
+  // The Dance Cam photo is kept in memory only, as a blob URL, and never uploaded or stored.
+  var inv = { type: "invite", you: "", them: "", email: "", ticket: "", night: "", note: "", includePhoto: false, step: 1, gifts: [] };
+  var invDlg = null, invOpener = null, invPendingPhoto = false, invPhotoUrl = null;
+  function fill(tpl, v) { return String(tpl || "").replace(/\{(\w+)\}/g, function (m, k) { return v[k] != null ? v[k] : m; }); }
+  function nightInfo(id) {
+    var I = D.invite;
+    if (id === "all") return { label: I.bothNights.label, night: I.bothNights.night, date: I.bothNights.date };
+    var day = byId(D.schedule.days, id), item = (D.hero.nights.items || []).filter(function (n) { return n.day === id; })[0];
+    return { label: day.label, night: item ? item.name : day.label, date: day.title };
+  }
+  // Gift options: every single-night tier on every night, plus passes that cover all nights.
+  function ticketOptions() {
+    var out = [];
+    D.tickets.tiers.forEach(function (t) {
+      if (t.days > 1) out.push({ value: t.id + "|all", tier: t, night: "all" });
+      else D.schedule.days.forEach(function (d) { out.push({ value: t.id + "|" + d.id, tier: t, night: d.id }); });
+    });
+    return out;
+  }
+  function ticketFor(value) {
+    return ticketOptions().filter(function (o) { return o.value === value; })[0] || ticketOptions()[0];
+  }
+  // Called by the Dance Cam each time a snapshot is made.
+  function setInvitePhoto(blob) {
+    if (invPhotoUrl) URL.revokeObjectURL(invPhotoUrl);
+    invPhotoUrl = URL.createObjectURL(blob);
+    inv.includePhoto = true;
+    if (invPendingPhoto) { invPendingPhoto = false; openInvite(null, null, true); }
+  }
+
+  function wireInvites() {
+    var I = D.invite;
+    if (!I) return;
+    invDlg = document.createElement("dialog");
+    if (typeof invDlg.showModal !== "function") { invDlg = null; return; }
+    invDlg.className = "invite";
+    invDlg.id = "invite";
+    invDlg.setAttribute("aria-labelledby", "inv-title");
+    document.body.appendChild(invDlg);
+
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-invite-open]");
+      if (b) { e.preventDefault(); openInvite(b.getAttribute("data-invite-open"), b); }
+    });
+    invDlg.addEventListener("click", function (e) {
+      if (e.target === invDlg || e.target.closest(".inv-close") || e.target.closest(".inv-done")) { invDlg.close(); return; }
+      if (e.target.closest(".inv-take")) { takePhotoNow(); return; }
+      if (e.target.closest(".inv-edit")) { show(1, "#inv-them"); return; }
+      if (e.target.closest(".inv-send")) { send(); return; }
+      if (e.target.closest(".inv-another")) { inv.them = ""; inv.email = ""; inv.note = ""; inv.sent = false; show(1, "#inv-them"); }
+    });
+    invDlg.addEventListener("submit", function (e) { e.preventDefault(); if (validate()) show(2); });
+    invDlg.addEventListener("input", function (e) { if (e.target.closest("form")) { read(); if (e.target.id === "inv-note") counter(); if (e.target.id === "inv-ticket") price(); } });
+    invDlg.addEventListener("change", function (e) { if (e.target.name === "inv-type") { read(); toggleType(); } });
+    invDlg.addEventListener("close", function () {
+      if (invOpener && document.contains(invOpener) && !invPendingPhoto) invOpener.focus();
+    });
+  }
+
+  // type: "gift", "invite" or "photo" (from the Dance Cam: keep the type, include the photo).
+  function openInvite(type, from, resume) {
+    if (!invDlg) return;
+    if (!resume) {
+      invPendingPhoto = false;
+      invOpener = from;
+      if (type === "gift" || type === "invite") inv.type = type;
+      if (type === "photo" && invPhotoUrl) inv.includePhoto = true;
+      // After a finished send, the next invite starts with a fresh recipient.
+      if (inv.sent) { inv.them = ""; inv.email = ""; inv.note = ""; inv.sent = false; }
+      // Each new registration prefills your name and, for a two-night pass, the night you're going.
+      if (state.reg && inv.regFor !== state.reg) {
+        inv.regFor = state.reg;
+        inv.you = state.reg.name;
+        if (state.reg.tier.days > 1) inv.night = "all";
+      }
+      if (!inv.ticket) inv.ticket = (state.tier && byId(D.tickets.tiers, state.tier) && byId(D.tickets.tiers, state.tier).days > 1) ? state.tier + "|all" : (state.tier || D.tickets.tiers[0].id) + "|" + D.schedule.days[0].id;
+      if (!inv.night) inv.night = state.reg && state.reg.tier.days > 1 ? "all" : D.schedule.days[0].id;
+    }
+    if (!invDlg.open) invDlg.showModal();
+    show(1, resume ? "#inv-photo" : null);
+  }
+
+  function takePhotoNow() {
+    read();
+    invPendingPhoto = true;
+    invDlg.close();
+    var cam = $("dancecam");
+    if (cam) cam.scrollIntoView();
+    var st = $("cam-status");
+    if (st) st.textContent = D.invite.takeHint;
+    var snap = $("cam-snap");
+    if (snap) snap.focus({ preventScroll: true });
+  }
+
+  function read() {
+    var f = invDlg.querySelector("form");
+    if (!f) return;
+    inv.type = f.elements["inv-type"].value || inv.type;
+    inv.you = f.elements["inv-you"].value.trim();
+    inv.them = f.elements["inv-them"].value.trim();
+    inv.email = f.elements["inv-email"].value.trim();
+    inv.ticket = f.elements["inv-ticket"].value;
+    inv.night = f.elements["inv-night"].value;
+    inv.note = f.elements["inv-note"].value;
+    var ph = f.elements["inv-photo"];
+    inv.includePhoto = !!(ph && ph.checked && invPhotoUrl);
+  }
+
+  function validate() {
+    read();
+    var first = null, I = D.invite;
+    function check(id, msg) {
+      var el = $(id);
+      el.setAttribute("aria-invalid", msg ? "true" : "false");
+      $(id + "-err").textContent = msg || "";
+      if (msg && !first) first = el;
+    }
+    check("inv-you", inv.you ? "" : I.errYou);
+    check("inv-them", inv.them ? "" : I.errThem);
+    check("inv-email", !inv.email ? I.errEmail : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inv.email) ? "" : I.errEmailFormat));
+    if (first) first.focus();
+    return !first;
+  }
+
+  function field(id, label, input, hint) {
+    return '<div class="field"><label for="' + id + '">' + esc(label) + (hint ? ' <span class="opt">' + esc(hint) + "</span>" : "") + "</label>" + input +
+      '<span class="error" id="' + id + '-err"></span></div>';
+  }
+  function stepOne() {
+    var I = D.invite;
+    var tickets = ticketOptions().map(function (o) {
+      var n = nightInfo(o.night);
+      return '<option value="' + o.value + '"' + (o.value === inv.ticket ? " selected" : "") + ">" + esc(o.tier.name + ", " + n.label + ", " + o.tier.price) + "</option>";
+    }).join("");
+    var nights = D.schedule.days.map(function (d) { return d.id; }).concat("all").map(function (id) {
+      return '<option value="' + id + '"' + (id === inv.night ? " selected" : "") + ">" + esc(nightInfo(id).label) + "</option>";
+    }).join("");
+    var photo = invPhotoUrl
+      ? '<div class="inv-photo"><img src="' + invPhotoUrl + '" alt="' + esc(I.photoAlt) + '"><label class="inv-check"><input type="checkbox" id="inv-photo" name="inv-photo"' + (inv.includePhoto ? " checked" : "") + "> " + esc(I.photo) + "</label></div>"
+      : '<div class="inv-photo is-empty"><p>' + esc(I.noPhoto) + '</p><button type="button" class="btn btn-small inv-take">' + esc(I.takePhoto) + "</button></div>";
+    return '<form class="inv-form" novalidate>' +
+      '<fieldset class="inv-type"><legend>' + esc(I.typeLegend) + "</legend>" +
+        '<label><input type="radio" name="inv-type" value="gift"' + (inv.type === "gift" ? " checked" : "") + "><span>" + esc(I.typeGift) + "</span></label>" +
+        '<label><input type="radio" name="inv-type" value="invite"' + (inv.type === "invite" ? " checked" : "") + "><span>" + esc(I.typeInvite) + "</span></label>" +
+      "</fieldset>" +
+      field("inv-you", I.you, '<input type="text" id="inv-you" name="inv-you" autocomplete="name" required aria-describedby="inv-you-err" value="' + esc(inv.you) + '">') +
+      '<div class="two-col">' +
+        field("inv-them", I.them, '<input type="text" id="inv-them" name="inv-them" required aria-describedby="inv-them-err" value="' + esc(inv.them) + '">') +
+        field("inv-email", I.email, '<input type="email" id="inv-email" name="inv-email" inputmode="email" required aria-describedby="inv-email-err" value="' + esc(inv.email) + '">') +
+      "</div>" +
+      '<div class="inv-gift-only">' + field("inv-ticket", I.ticket, '<select id="inv-ticket" name="inv-ticket" aria-describedby="inv-price">' + tickets + "</select>") +
+        '<p class="inv-price" id="inv-price" aria-live="polite"></p></div>' +
+      '<div class="inv-invite-only">' + field("inv-night", I.night, '<select id="inv-night" name="inv-night">' + nights + "</select>") + "</div>" +
+      field("inv-note", I.note, '<textarea id="inv-note" name="inv-note" maxlength="140" aria-describedby="inv-count">' + esc(inv.note) + "</textarea>", I.optional) +
+      '<p class="hint inv-count" id="inv-count"></p>' +
+      photo +
+      '<div class="inv-actions"><button type="submit" class="btn btn-primary">' + esc(I.previewButton) + "</button></div>" +
+    "</form>";
+  }
+  function emailHtml() {
+    var I = D.invite, gift = inv.type === "gift", t = ticketFor(inv.ticket), n = nightInfo(gift ? t.night : inv.night);
+    var v = { you: esc(inv.you), them: esc(inv.them), tier: esc(t.tier.name), night: esc(n.night), date: esc(n.date) };
+    var stub = gift ? '<div class="stub" aria-label="' + esc(I.stubLabel) + '"><div class="stub-main">' +
+        '<p class="stub-admit">' + esc(I.admit) + '</p><p class="stub-name">' + v.them + "</p>" +
+        '<p class="stub-meta">' + v.night + ", " + v.date + '</p><p class="stub-meta">' + v.tier + "</p></div>" +
+        '<div class="stub-side" aria-hidden="true">' + esc(D.meta.shortName) + "</div></div>" : "";
+    return '<div class="phone"><div class="phone-screen">' +
+      '<div class="mail-head">' +
+        '<p><span class="mh-k">' + esc(I.fromLabel) + "</span> " + fill(esc(I.from), v) + "</p>" +
+        '<p><span class="mh-k">' + esc(I.toLabel) + "</span> " + v.them + " &lt;" + esc(inv.email) + "&gt;</p>" +
+        '<p class="mail-subject">' + fill(esc(gift ? I.giftSubject : I.inviteSubject), v) + "</p>" +
+      "</div>" +
+      '<div class="mail-body">' +
+        '<p class="mail-brand">' + esc(D.meta.name) + "</p>" +
+        '<p class="mail-headline">' + fill(esc(gift ? I.giftHeadline : I.inviteHeadline), v) + "</p>" +
+        "<p>" + fill(esc(gift ? I.giftLine : I.inviteLine), v) + "</p>" +
+        stub +
+        (inv.includePhoto && invPhotoUrl ? '<img class="mail-photo" src="' + invPhotoUrl + '" alt="' + esc(I.photoAlt) + '">' : "") +
+        (inv.note.trim() ? '<blockquote class="mail-note">&ldquo;' + esc(inv.note.trim()) + "&rdquo;</blockquote>" : "") +
+        '<span class="mail-btn">' + esc(gift ? I.giftButton : I.inviteButton) + "</span>" +
+        '<p class="mail-foot">' + esc(D.meta.name) + "<br>" + esc(D.meta.dates) + "<br>" + esc(D.meta.venue) + ", " + esc(D.meta.address) + "</p>" +
+      "</div></div></div>";
+  }
+  function show(step, focusSel) {
+    var I = D.invite;
+    inv.step = step;
+    var title = step === 1 ? I.title : step === 2 ? I.previewTitle : fill(I.sentTitle, { them: inv.them });
+    var body = step === 1 ? stepOne()
+      : step === 2 ? '<div class="inv-preview">' + emailHtml() + '<div class="inv-side"><p>' + esc(I.previewHint) + "</p>" +
+          '<div class="inv-actions"><button type="button" class="btn inv-edit">' + esc(I.edit) + '</button><button type="button" class="btn btn-primary inv-send">' + esc(I.send) + "</button></div></div></div>"
+      : '<p class="inv-demo">' + esc(I.sentDemo) + "</p>" +
+        '<div class="inv-actions"><button type="button" class="btn inv-another">' + esc(I.another) + '</button><button type="button" class="btn btn-primary inv-done">' + esc(I.done) + "</button></div>";
+    invDlg.className = "invite is-step-" + step;
+    invDlg.innerHTML = '<div class="inv-inner">' +
+      '<button type="button" class="artist-close inv-close" aria-label="' + esc(I.close) + '"><span aria-hidden="true">&times;</span></button>' +
+      '<h2 class="inv-title" id="inv-title" tabindex="-1">' + esc(title) + "</h2>" + body + "</div>";
+    rollify(invDlg);
+    if (step === 1) { toggleType(); counter(); price(); }
+    var target = focusSel ? invDlg.querySelector(focusSel) : null;
+    if (!target && invDlg.open) target = $("inv-title");
+    if (target) setTimeout(function () { target.focus(); }, 0);
+    invDlg.scrollTop = 0;
+  }
+  function toggleType() {
+    var gift = inv.type === "gift";
+    invDlg.querySelector(".inv-gift-only").hidden = !gift;
+    invDlg.querySelector(".inv-invite-only").hidden = gift;
+  }
+  function counter() { var el = $("inv-count"); if (el) el.textContent = fill(D.invite.counter, { n: $("inv-note").value.length, max: 140 }); }
+  function price() { var el = $("inv-price"); if (el) el.textContent = fill(D.invite.priceLine, { price: ticketFor($("inv-ticket").value).tier.price }); }
+  function send() {
+    if (inv.type === "gift") {
+      var t = ticketFor(inv.ticket);
+      inv.gifts.push({ them: inv.them, tier: t.tier.name, night: nightInfo(t.night).label, price: t.tier.price });
+      renderGifts();
+    }
+    inv.sent = true;
+    show(3);
+  }
+  // Gifts appear in the registration confirmation summary (now, or once the visitor registers).
+  function renderGifts() {
+    var el = $("confirm-gifts");
+    if (!el) return;
+    el.innerHTML = inv.gifts.map(function (g) {
+      return "<dt>" + esc(D.invite.giftLabel) + "</dt><dd>" + esc(fill(D.invite.giftEntry, g)) + "</dd>";
+    }).join("");
   }
 
   // ---------- wiring ----------
@@ -1182,16 +1427,20 @@
 
   function confirm(rec) {
     var r = D.registration, days = daysForTier(rec.tier.id);
+    state.reg = rec;
     $("reg-out").innerHTML =
       '<div class="confirm" role="status" tabindex="-1" id="reg-confirm">' +
         '<h3>You\'re registered.</h3><p class="confirm-demo">Demo confirmation. Nothing was sent anywhere.</p>' +
         '<dl class="confirm-dl"><dt>Name</dt><dd>' + esc(rec.name) + "</dd><dt>Email</dt><dd>" + esc(rec.email) +
         "</dd><dt>Ticket</dt><dd>" + esc(rec.tier.name) + ", " + esc(rec.tier.price) + "</dd></dl>" +
+        '<dl class="confirm-dl" id="confirm-gifts"></dl>' +
         "<p>" + copy(r.confirmation) + "</p>" +
         '<div class="confirm-actions">' + days.map(function (d) {
           return '<button type="button" class="btn btn-small" data-ics-day="' + d.id + '" data-ics-tier="' + rec.tier.id + '">Add ' + esc(d.label) + " to calendar</button>";
-        }).join("") + '<button type="button" class="btn btn-small" id="reg-again">Register someone else</button></div>' +
+        }).join("") + (D.invite ? '<button type="button" class="btn btn-small" data-invite-open="invite">' + esc(D.invite.confirmButton) + "</button>" : "") +
+        '<button type="button" class="btn btn-small" id="reg-again">Register someone else</button></div>' +
       "</div>";
+    renderGifts();
     rollify($("reg-out"));
     $("reg-confirm").focus();
     fireConfetti();
@@ -1296,7 +1545,7 @@
       renderHero();
       renderChrome();
       renderMarquee();
-      wireTabs(); wireMatrix(); wireForm(); wireGlobal(); wireDanceCam(); wireArtists();
+      wireTabs(); wireMatrix(); wireForm(); wireGlobal(); wireDanceCam(); wireArtists(); wireInvites();
       danceFloor(); lightScenes();
       rollify(document); initReveal();
       if (location.hash.length > 1) {

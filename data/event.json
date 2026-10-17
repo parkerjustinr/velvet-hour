@@ -79,7 +79,8 @@
           "src": "audio/rio.mp3",
           "title": "Velvet Ultimatum",
           "length": "2:47"
-        }
+        },
+        "face": [0.53, 0.19, 4.5]
       },
       {
         "id": "june",
@@ -95,7 +96,8 @@
           "src": "audio/june.mp3",
           "title": "Two Coats, One Umbrella",
           "length": "2:21"
-        }
+        },
+        "face": [0.5, 0.36, 2.6]
       },
       {
         "id": "theo",
@@ -111,7 +113,8 @@
           "src": "audio/band.mp3",
           "title": "Countdown in Chrome",
           "length": "2:43"
-        }
+        },
+        "face": [0.55, 0.3, 3.2]
       },
       {
         "id": "brass",
@@ -127,7 +130,8 @@
           "src": "audio/band.mp3",
           "title": "Countdown in Chrome",
           "length": "2:43"
-        }
+        },
+        "face": [0.76, 0.29, 3.2]
       },
       {
         "id": "polyester",
@@ -143,7 +147,8 @@
           "src": "audio/dj-friday.mp3",
           "title": "Slow Sway Edit",
           "length": "1:11"
-        }
+        },
+        "face": [0.55, 0.29, 2.2]
       },
       {
         "id": "lavalamp",
@@ -159,7 +164,8 @@
           "src": "audio/dj-saturday.mp3",
           "title": "Lava Flow Breaks",
           "length": "1:25"
-        }
+        },
+        "face": [0.57, 0.37, 2.8]
       },
       {
         "id": "bobbie",
@@ -170,9 +176,10 @@
         "link": "",
         "alt": "Bobbie Dazzle in a black suit and sunglasses, adjusting a tie",
         "style": "Host and crowd-cam ringleader / Washington, DC",
-        "about": "Bobbie Dazzle runs the room between scenes: the lottery draw, the crowd cam warm-up, Friday's Heart Cam and Saturday's dance-off. If you are on the big screen, Bobbie probably put you there."
+        "about": "Bobbie Dazzle runs the room between scenes: the lottery draw, the crowd cam warm-up, Friday's Heart Cam and Saturday's dance-off. If you are on the big screen, Bobbie probably put you there.",
+        "face": [0.47, 0.29, 3.2]
       },
-      {"id": "guest", "name": "Surprise guest", "role": "Sat - Full Funk only. Name not announced.", "bio": "", "photo": "img/lineup/guest.svg", "alt": "A plum silhouette with a gold question mark", "plain": true, "link": "", "about": "Saturday only. You'll know when the lights go out."}
+      {"id": "guest", "name": "Surprise guest", "role": "Sat - Full Funk only. Name not announced.", "bio": "", "photo": "img/lineup/guest.svg", "alt": "A plum silhouette with a gold question mark", "plain": true, "link": "", "about": "Saturday only. You'll know when the lights go out.", "face": [0.5, 0.45, 1.25]}
     ],
     "viewLabel": "View artist",
     "popup": {
@@ -358,5 +365,64 @@
     "pause": "Pause",
     "play": "Play",
     "hidden": "scrolling names"
+  },
+
+  "invite": {
+    "title": "Bring someone",
+    "previewTitle": "Here's what they'll get",
+    "sentTitle": "Invite sent to {them}.",
+    "close": "Close",
+    "typeLegend": "What are you sending?",
+    "typeGift": "I got them a ticket",
+    "typeInvite": "Invite them to get one",
+    "you": "Your name",
+    "them": "Their name",
+    "email": "Their email",
+    "ticket": "Which ticket",
+    "priceLine": "Price: {price}",
+    "night": "Which night are you going?",
+    "note": "Personal note",
+    "optional": "(optional)",
+    "counter": "{n} / {max} characters",
+    "photo": "Include my Dance Cam photo",
+    "photoAlt": "Your Dance Cam snapshot on a Polaroid-style card",
+    "noPhoto": "No Dance Cam photo yet.",
+    "takePhoto": "Take one now",
+    "takeHint": "Take a snapshot and it goes straight into your invite.",
+    "previewButton": "Preview invite",
+    "previewHint": "This is the invitation exactly as it would land in their inbox.",
+    "edit": "Edit",
+    "send": "Send invite",
+    "fromLabel": "From",
+    "toLabel": "To",
+    "from": "Velvet Hour, on behalf of {you}",
+    "giftSubject": "{you} got you a ticket to Velvet Hour",
+    "giftHeadline": "You're on the list.",
+    "giftLine": "{you} got you a {tier} ticket for {night}, {date} at The Anthem in Washington, DC.",
+    "giftButton": "See your ticket",
+    "inviteSubject": "{you} is going to Velvet Hour",
+    "inviteHeadline": "Come dance with {you}.",
+    "inviteLine": "{you} has a ticket to {night}, {date} at The Anthem, and wants you on the floor.",
+    "inviteButton": "Get your ticket",
+    "admit": "Admit one",
+    "stubLabel": "Ticket stub",
+    "bothNights": {
+      "label": "Both nights",
+      "night": "Slow Burn and Full Funk",
+      "date": "Nov 20 and 21"
+    },
+    "sentDemo": "Demo: no email was actually sent.",
+    "another": "Send another",
+    "done": "Done",
+    "giftLabel": "Gift",
+    "giftEntry": "{tier}, {night} for {them}, {price}",
+    "errYou": "Enter your name.",
+    "errThem": "Enter their name.",
+    "errEmail": "Enter their email.",
+    "errEmailFormat": "Check the email format, for example name@example.com.",
+    "ticketsLine": "Buying for someone else?",
+    "ticketsLink": "Send it as a gift.",
+    "confirmButton": "Bring someone",
+    "camButton": "Add to an invite"
   }
 }

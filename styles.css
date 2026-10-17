@@ -218,15 +218,10 @@ main:focus { outline: none; }
 .sp-name a { text-decoration: none; }
 .sp-role { color: var(--muted); font-size: 0.95rem; margin-bottom: 10px; }
 .sp-bio { max-width: 52ch; font-size: 1.1rem; }
-.sp-sessions li { border-top: var(--hair); padding: 6px 0; font-size: 0.95rem; break-inside: avoid; }
-.sp-sessions a { text-decoration: none; display: block; }
-.sp-sessions a:hover { text-decoration: underline; }
-.sp-sessions .t { font-weight: 700; }
 .sp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 16px; }
 .sp-card { border-top: 3px solid var(--chrome); padding-top: 12px; }
 @media (min-width: 720px) {
   .sp-featured { grid-template-columns: minmax(240px, 360px) 1fr; gap: 32px; padding: 24px; }
-  .sp-featured .sp-sessions { columns: 2; column-gap: 24px; }
   .sp-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (min-width: 1040px) { .sp-grid { grid-template-columns: repeat(4, 1fr); gap: 36px 24px; } }
@@ -301,8 +296,16 @@ main:focus { outline: none; }
 .session.is-flash { background: var(--bg-2); }
 .s-time { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--chrome); }
 .s-title { font-family: var(--body); font-weight: 800; font-size: 1.3rem; line-height: 1.2; }
-.s-speakers { margin: 4px 0 0; font-weight: 600; }
-.s-speakers a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+/* Performers: overlapping round faces (same duotone as the lineup), then names. Both open the artist popup. */
+.s-speakers { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 0; font-weight: 600; }
+.s-faces { display: inline-flex; flex: none; }
+.s-faces:empty { display: none; }
+.s-face { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bg); background-color: var(--bg-2); background-repeat: no-repeat; cursor: pointer; }
+.s-face + .s-face { margin-left: -10px; }
+.s-face.is-duotone { filter: url(#duotone); }
+.session.is-flash .s-face { border-color: var(--bg-2); }
+.s-person { appearance: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.s-person:hover { text-decoration-thickness: 2px; }
 .s-detail { margin: 4px 0 0; color: var(--muted); }
 .s-track { justify-self: start; font-size: 0.85rem; font-weight: 700; padding: 2px 10px; background: var(--track); color: var(--on-track); }
 @media (min-width: 760px) {
@@ -344,6 +347,9 @@ td.is-sel .yes { color: var(--gold); }
 .matrix tfoot th { text-align: left; font-weight: 800; }
 .matrix tfoot td { font-weight: 700; }
 .matrix-cta { display: grid; gap: 10px; justify-items: start; }
+.gift-line { margin: 4px 0 0; }
+.gift-link { appearance: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.gift-link:hover { color: var(--gold); }
 
 /* Phones: every row stacks - label on top, one small cell per tier underneath. No sideways scroll. */
 @media (max-width: 879px) {
@@ -413,6 +419,7 @@ td.is-sel .yes { color: var(--gold); }
 .confirm h3 { font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 8px; }
 .confirm-dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin-bottom: 14px; }
 .confirm-dl dt { font-weight: 700; }
+#confirm-gifts:empty { display: none; }
 .confirm-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (min-width: 960px) {
   .sec-register .wrap { grid-template-columns: 4fr 7fr; }
@@ -538,3 +545,65 @@ html:has(dialog[open]) { overflow: hidden; }
 .player-now { margin: 8px 0 0; min-height: 1.4em; font-size: 0.9rem; color: var(--muted); }
 .player-note { margin: 12px 0 0; font-size: 0.85rem; color: var(--muted); }
 @media (min-width: 560px) { .player-deck { grid-template-columns: 150px 1fr; } }
+
+/* ---------- "Bring someone" invite builder ---------- */
+.invite { padding: 0; border: 3px solid var(--chrome); background: var(--bg); color: var(--fg); width: min(860px, calc(100vw - 48px)); max-width: none; max-height: calc(100vh - 48px); overflow: auto; }
+.invite::backdrop { background: rgba(28, 7, 24, 0.85); }
+.inv-inner { position: relative; padding: 24px var(--gutter) 28px; }
+.inv-title { font-size: clamp(2rem, 7vw, 3rem); margin: 0 64px 18px 0; }
+.inv-title:focus { outline: none; }
+.inv-form { display: grid; gap: 18px; }
+.inv-form [hidden] { display: none; }
+.inv-type { display: grid; grid-template-columns: 1fr 1fr; border: var(--rule); padding: 0; margin: 0; }
+.inv-type legend { padding: 0 0 8px; font-weight: 700; }
+.inv-type label { position: relative; display: block; cursor: pointer; }
+.inv-type label + label { border-left: var(--rule); }
+.inv-type input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.inv-type span { display: block; height: 100%; padding: 12px 14px; font-weight: 700; transition: background-color 200ms ease, color 200ms ease; }
+.inv-type label:hover span { background: var(--bg-2); }
+.inv-type input:checked + span { background: var(--gold); color: var(--on-gold); }
+.inv-type input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
+.inv-price { margin: 6px 0 0; font-weight: 700; }
+.inv-count { margin: -12px 0 0; }
+.inv-photo { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; padding: 12px; background: var(--bg-2); }
+.inv-photo img { width: 96px; height: auto; transform: rotate(-2deg); }
+.inv-photo.is-empty { grid-template-columns: 1fr; justify-items: start; }
+.inv-photo.is-empty p { margin: 0; color: var(--muted); }
+.inv-check { display: flex; gap: 10px; align-items: center; font-weight: 700; cursor: pointer; }
+.inv-check input { width: 20px; height: 20px; accent-color: var(--gold); }
+.inv-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.inv-demo { color: var(--muted); }
+.inv-preview { display: grid; gap: 22px; }
+.inv-side p { max-width: 36ch; }
+/* The email, as it would land on a phone */
+.phone { width: 100%; max-width: 360px; border: 10px solid var(--chrome); border-radius: 30px; background: var(--chrome); overflow: hidden; }
+.phone-screen { background: #fffaf0; color: var(--bg); border-radius: 20px; overflow: hidden; }
+.mail-head { padding: 14px 16px 12px; border-bottom: 1px solid color-mix(in srgb, var(--bg) 20%, transparent); font-size: 0.85rem; }
+.mail-head p { margin: 0 0 2px; overflow-wrap: anywhere; }
+.mh-k { display: inline-block; min-width: 40px; color: color-mix(in srgb, var(--bg) 70%, transparent); }
+.mail-subject { margin-top: 6px !important; font-weight: 800; font-size: 1rem; }
+.mail-body { padding: 0 16px 18px; }
+.mail-body > p { font-size: 0.98rem; }
+.mail-body .mail-brand { margin: 0 -16px 16px; padding: 10px 16px; background: var(--bg); color: var(--fg); font-family: var(--display); font-size: 1.3rem; }
+.mail-body .mail-headline { margin: 0 0 8px; font-family: var(--display); font-size: 1.9rem; line-height: 1.1; }
+.mail-photo { display: block; width: 86%; margin: 14px 0 16px 4px; transform: rotate(-2deg); }
+.mail-note { margin: 0 0 16px; padding: 0; font-size: 1.05rem; font-style: normal; font-weight: 600; }
+.mail-btn { display: inline-block; margin: 2px 0 18px; padding: 10px 18px; background: var(--gold); color: var(--on-gold); font-weight: 800; }
+.mail-foot { margin: 0; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--bg) 20%, transparent); font-size: 0.8rem; color: color-mix(in srgb, var(--bg) 75%, transparent); }
+/* Gift ticket stub: gold means the ticket you picked */
+.stub { display: grid; grid-template-columns: 1fr 52px; margin: 6px 0 16px; background: var(--gold); color: var(--on-gold); }
+.stub-main { padding: 12px 14px; border-right: 2px dotted var(--on-gold); }
+.stub-main p { margin: 0; }
+.stub-admit { font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.stub-name { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; }
+.stub-meta { font-weight: 700; font-size: 0.9rem; }
+.stub-side { display: grid; place-items: center; font-family: var(--display); font-size: 1.1rem; writing-mode: vertical-rl; }
+@media (min-width: 760px) {
+  .inv-inner { padding: 36px 36px 36px; }
+  .inv-preview { grid-template-columns: 360px 1fr; align-items: start; gap: 32px; }
+}
+/* Phones: a full-screen sheet that slides up. */
+@media (max-width: 759px) {
+  .invite { width: 100vw; height: 100vh; height: 100dvh; max-height: none; margin: 0; inset: 0; border: 0; }
+  .invite[open] { animation: sheet-up 380ms cubic-bezier(.2, .7, .2, 1); }
+}

@@ -17,10 +17,11 @@ One-page event site. Plain HTML, CSS, vanilla JS. No framework, no build step. D
 - jam-winner/ is a frozen snapshot of the judged version. Never edit anything inside it.
 
 ## Built-in features (keep them working)
-- Featured speaker plus grid. Speakers link to their sessions and sessions link back, switching the day tab if needed.
+- Featured speaker plus grid. Every lineup card, and every performer name or face in the run of show, opens the artist popup. The popup lists set times that switch the day tab and land on the slot.
 - Schedule day tabs (arrow keys work), track colors, "show my time" toggle (Intl API), per-day .ics download.
 - Ticket breakdown matrix: pick a column to choose a ticket, hover or focus a row for a side preview on desktop, tap a row to open it inline on phones. No sideways scroll on phones. Cost-per-day row is computed.
 - Demo registration with validation and a confirmation state. Nothing is sent anywhere.
+- "Bring someone" invite builder (demo, nothing is sent): gift or invite, email preview, sent state. Opens from the confirmation, the Tickets section and the Dance Cam. The Dance Cam photo stays in memory only. Copy lives in `invite` in data/event.json.
 - Skip link, visible focus, reduced-motion support.
 
 ## Rules
