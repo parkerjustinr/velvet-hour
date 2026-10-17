@@ -397,6 +397,7 @@
   "invite": {
     "previewTitle": "Here's what they'll get",
     "sentTitle": "Invite sent to {them}.",
+    "sentTitleGift": "Ticket sent to {them}.",
     "close": "Close",
     "you": "Your name",
     "them": "Their name",

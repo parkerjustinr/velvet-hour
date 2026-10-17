@@ -1289,7 +1289,7 @@
     var I = D.invite;
     inv.step = step;
     var title = step === 1 ? (inv.type === "gift" ? fill(I.titleGift, { them: inv.them }) : I.titleInvite)
-      : step === 2 ? I.previewTitle : fill(I.sentTitle, { them: inv.them });
+      : step === 2 ? I.previewTitle : fill(inv.type === "gift" ? I.sentTitleGift : I.sentTitle, { them: inv.them });
     var body = step === 1 ? stepOne()
       : step === 2 ? '<div class="inv-preview">' + emailHtml() + '<div class="inv-side"><p>' + esc(I.previewHint) + "</p>" +
           '<div class="inv-actions"><button type="button" class="btn inv-edit">' + esc(I.edit) + '</button><button type="button" class="btn btn-primary inv-send">' + esc(I.send) + "</button></div></div></div>"
@@ -1448,7 +1448,10 @@
         return "<li><span class=\"ol-who\">" + esc(l.who) + ":</span> " + esc(ticketLabel(l.ticket)) + "</li>";
       }).join("");
       $("order-total").textContent = dollars(total);
-      setLabel($("reg-submit"), esc(lines.length === 1 ? r.submitOne : fill(r.submitMany, { n: lines.length, total: dollars(total) })));
+      // Only touch the button when its label changes: rebuilding it mid-click (a field's change event fires on
+      // mousedown) would swallow the click.
+      var label = lines.length === 1 ? r.submitOne : fill(r.submitMany, { n: lines.length, total: dollars(total) }), btn = $("reg-submit"), cur = btn.querySelector(".roll-a");
+      if ((cur ? cur.textContent : btn.textContent) !== label) setLabel(btn, esc(label));
     }
     $("add-guest").addEventListener("click", function () {
       readGuests();
