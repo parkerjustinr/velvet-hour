@@ -22,7 +22,8 @@ One-page event site. Plain HTML, CSS, vanilla JS. No framework, no build step. D
 - Ticket breakdown matrix: pick a column to choose a ticket, hover or focus a row for a side preview on desktop, tap a row to open it inline on phones. No sideways scroll on phones. Cost-per-day row is computed.
 - Demo registration with validation and a confirmation state. Nothing is sent anywhere. Your ticket is tier plus night (synced with the matrix), up to 5 guests each with their own ticket, a live order summary priced from data/event.json, and a confirmation listing every ticket.
 - Invite builder (demo, nothing is sent): "Invite a friend" (Tickets, Register, confirmation) and "Add to an invite" after a Dance Cam snapshot open invite mode; "Send [Name] their ticket" on the confirmation opens gift mode for that guest. Email preview, then a sent state. The Dance Cam photo stays in memory only. Copy lives in `invite` in data/event.json.
-- Skip link, visible focus, reduced-motion support.
+- Skip link, visible focus, Motion toggle.
+- Motion is on by default regardless of OS setting. Visitors turn it off with the Motion toggle.
 
 ## Rules
 - No em dashes anywhere, in code comments or copy. Use a hyphen.

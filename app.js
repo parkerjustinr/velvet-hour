@@ -16,6 +16,33 @@
   function copy(v) { return esc(v).replace(/\[PLACEHOLDER\]\s?/g, '<span class="ph">Placeholder</span> '); }
   function $(id) { return document.getElementById(id); }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+  // ---------- motion ----------
+  // Motion is on by default, whatever the OS setting. The Motion toggle (footer, and the header on wide
+  // screens) turns it off: html.motion-off stills every animation and leaves all content visible.
+  // The choice is saved in localStorage; a script in <head> applies it before the first paint.
+  var MOTION_KEY = "velvet-hour-motion", motionFns = [];
+  function motionOff() { return document.documentElement.classList.contains("motion-off"); }
+  function onMotion(fn) { motionFns.push(fn); }
+  function setMotion(on) {
+    document.documentElement.classList.toggle("motion-off", !on);
+    try { localStorage.setItem(MOTION_KEY, on ? "on" : "off"); } catch (e) { /* storage blocked: the choice lasts this visit */ }
+    syncMotionToggles();
+    motionFns.forEach(function (fn) { fn(on); });
+  }
+  function motionToggle(extra) {
+    return '<button type="button" class="motion-toggle' + (extra || "") + '" aria-label="Motion" aria-pressed="true">Motion: <span class="mt-state">On</span></button>';
+  }
+  function syncMotionToggles() {
+    var on = !motionOff();
+    Array.prototype.forEach.call(document.querySelectorAll(".motion-toggle"), function (b) {
+      b.setAttribute("aria-pressed", String(on));
+      b.querySelector(".mt-state").textContent = on ? "On" : "Off";
+    });
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest(".motion-toggle")) setMotion(motionOff());
+  });
+
   function trackIndex(id) { for (var i = 0; i < D.tracks.length; i++) if (D.tracks[i].id === id) return i + 1; return 0; }
 
   // ---------- time zones ----------
@@ -383,11 +410,11 @@
   // ---------- hero moment: light-up dance floor ----------
   // Diagonal bands of light chase across the floor in the three track colors.
   // Squares under the cursor or finger light up; on phones, scrolling moves the chase.
-  // Reduced motion: one still lit frame, no chase, no tracking.
+  // Motion off: one still lit frame, no chase, no tracking.
   function danceFloor() {
     var host = $("hero-moment"), hero = $("top");
     if (!host || !hero) return;
-    var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var still = motionOff;
     var floor = document.createElement("div");
     floor.className = "floor";
     host.appendChild(floor);
@@ -436,12 +463,13 @@
           var el = cells[r * cols + c];
           if (el._until > now) continue;
           var d = c + r - phase, m = ((d % 7) + 7) % 7, band = Math.floor(d / 7);
-          var lit = m === 0 || (still && m === 3) || ((c * 31 + r * 17 + phase * 7) % 23 === 0);
+          var lit = m === 0 || (still() && m === 3) || ((c * 31 + r * 17 + phase * 7) % 23 === 0);
           cls(el, lit ? "l" + ((((band + (m === 3 ? 1 : 0)) % 3) + 3) % 3 + 1) : "");
         }
       }
     }
     function lightAt(x, y) {
+      if (still()) return;
       var rect = host.getBoundingClientRect();
       var c = Math.floor((x - rect.left - GAP) / pitch), r = Math.floor((y - rect.top - GAP) / pitch);
       if (c < 0 || r < 0 || c >= cols || r >= rows) return;
@@ -453,7 +481,7 @@
       cls(el, "l" + h + " hot");
       setTimeout(function () { cls(el, "l" + h); }, 120);
     }
-    function start() { if (!timer && !still && onScreen && !document.hidden) timer = setInterval(function () { tick++; paint(); }, 560); }
+    function start() { if (!timer && !still() && onScreen && !document.hidden) timer = setInterval(function () { tick++; paint(); }, 560); }
     function stop() { clearInterval(timer); timer = null; }
 
     build();
@@ -461,13 +489,13 @@
     if ("ResizeObserver" in window) new ResizeObserver(function () { markDim(); }).observe($("hero"));
     var resizeT;
     window.addEventListener("resize", function () { clearTimeout(resizeT); resizeT = setTimeout(build, 150); });
-    if (still) return;
     start();
+    onMotion(function (on) { if (on) start(); else stop(); paint(); });
     hero.addEventListener("pointermove", function (e) { lightAt(e.clientX, e.clientY); });
     hero.addEventListener("touchmove", function (e) { var t = e.touches[0]; if (t) lightAt(t.clientX, t.clientY); }, { passive: true });
     var queued = false;
     window.addEventListener("scroll", function () {
-      if (!onScreen || queued) return;
+      if (!onScreen || queued || still()) return;
       queued = true;
       requestAnimationFrame(function () {
         queued = false;
@@ -506,13 +534,14 @@
   // A 1970s TV dance show broadcast. Each frame, the camera (mirrored) or the demo dancer is drawn into a
   // canvas and the chosen effect runs on it. Everything happens in this browser: nothing is recorded,
   // uploaded or sent. Snapshots stay on the device unless the visitor saves them, to their own device.
-  // Safety: no full-frame flashes, nothing blinks faster than about once a second, and with reduced
-  // motion every effect is drawn still and the demo dancer does not bounce.
+  // Safety: no full-frame flashes, nothing blinks faster than about once a second, and with
+  // Motion off every effect is drawn still and the demo dancer does not bounce.
   function wireDanceCam() {
     var cv = $("cam-canvas"), video = $("cam-video"), sec = $("dancecam");
     if (!cv || !cv.getContext) return;
     var c = D.dancecam, ctx = cv.getContext("2d"), W = cv.width, H = cv.height, K = H / 360;
-    var still = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+    var still = motionOff();
+    onMotion(function () { kick(); });
     var css = getComputedStyle(document.documentElement);
     function tok(n) { return css.getPropertyValue(n).trim(); }
     var COL = { bg: tok("--bg"), deep: tok("--bg-deep"), fg: tok("--fg"), chrome: tok("--chrome"), gold: tok("--gold"),
@@ -701,6 +730,7 @@
     // ----- render loop: runs only while the section is on screen -----
     function render(now) {
       raf = null;
+      still = motionOff();
       var t = still ? 0 : (now || performance.now()) / 1000;
       ctx.save(); FX[fx](t); ctx.restore();
       // A still demo only needs one frame; a camera or a moving effect needs every frame.
@@ -805,7 +835,7 @@
   // ---------- confetti cannon ----------
   // Two bursts from the bottom corners in the three light colors, about 2 seconds, then the canvas goes away.
   function fireConfetti() {
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (motionOff()) return;
     var cv = document.createElement("canvas"), ctx = cv.getContext && cv.getContext("2d");
     if (!ctx) return;
     var css = getComputedStyle(document.documentElement);
@@ -869,12 +899,12 @@
   // Section headlines sharpen in word by word, lineup photos wipe up from the bottom edge, and cards and
   // rows stagger in 60ms apart. Each element animates once, 450-550ms, and nothing waits more than 420ms.
   // The hidden starting state only exists under html.reveal-on, which this script adds, so the page stays
-  // fully visible if the script fails. Reduced motion never adds it.
+  // fully visible if the script fails. Motion off (html.motion-off) cancels it.
   // Photos are observed through their wrapper: a fully clipped element never counts as intersecting.
   var REVEAL = { words: ".section-title", wipe: ".sp-media", stagger: ".sp-featured, .sp-card, .session, .ruled > div, .faq-item" };
   var revealIO = null;
   function initReveal() {
-    if (!("IntersectionObserver" in window) || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    if (!("IntersectionObserver" in window)) return;
     revealIO = new IntersectionObserver(function (entries) {
       var k = 0;
       entries.forEach(function (e) {
@@ -1626,7 +1656,10 @@
       '<nav aria-label="Footer"><ul class="footer-links">' + on.map(function (s) { return '<li><a href="#' + s.id + '">' + esc(s.label) + "</a></li>"; }).join("") + "</ul></nav>" +
       '<p class="footer-small">' + esc(m.dates) + " / " + esc(m.venue) + ", " + esc(m.city) + "</p>" +
       '<p class="footer-small">' + esc(m.footerLine || "") + "</p>" +
-      (m.creditLine ? '<p class="footer-credit">' + esc(m.creditLine) + "</p>" : "") + "</div>";
+      (m.creditLine ? '<p class="footer-credit">' + esc(m.creditLine) + "</p>" : "") +
+      '<p class="footer-motion">' + motionToggle() + "</p></div>";
+    $("header-cta").insertAdjacentHTML("beforebegin", motionToggle(" header-motion"));
+    syncMotionToggles();
   }
 
   function showError(err) {

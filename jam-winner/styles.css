@@ -42,10 +42,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
+html.motion-off { scroll-behavior: auto; }
+.motion-off *, .motion-off *::before, .motion-off *::after { animation: none !important; transition: none !important; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 1.0625rem; line-height: 1.55; overflow-x: hidden; font-synthesis: none; }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
@@ -102,16 +100,14 @@ main:focus { outline: none; }
 .btn-primary:hover { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 .btn-small { min-height: 40px; padding: 6px 14px; font-size: 0.95rem; }
 /* Label roll: the label rolls up and out while an identical aria-hidden copy rolls in from below,
-   in step with the background fill change. Reduced motion keeps the color change only. */
+   in step with the background fill change. Motion off keeps the color change only. */
 .roll { display: inline-grid; overflow: hidden; vertical-align: top; }
 .roll > span { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: 10px; transition: transform 320ms cubic-bezier(.6, 0, .2, 1); }
 .roll-b { transform: translateY(110%); }
 :is(.btn, .fx-btn):is(:hover, :focus-visible) .roll-a { transform: translateY(-110%); }
 :is(.btn, .fx-btn):is(:hover, :focus-visible) .roll-b { transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .roll-a, .roll-b { transform: none !important; }
-  .roll-b { visibility: hidden; }
-}
+.motion-off .roll-a, .motion-off .roll-b { transform: none !important; }
+.motion-off .roll-b { visibility: hidden; }
 
 /* ---------- hero: light-up dance floor ---------- */
 .hero { position: relative; overflow: hidden; border-bottom: var(--rule); background: var(--bg-deep); }
@@ -181,7 +177,7 @@ main:focus { outline: none; }
 .section.is-lit::before { transform: scaleX(1); animation: sweep 1100ms cubic-bezier(.2, .7, .2, 1) both; }
 .section.is-held::before { animation: none; }
 @keyframes sweep { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@media (prefers-reduced-motion: reduce) { .section::before { transform: scaleX(1); } }
+.motion-off .section::before { transform: scaleX(1); }
 .section-title { font-size: clamp(2.5rem, 11vw, 5rem); margin-bottom: 24px; }
 .lede { font-size: 1.15rem; max-width: 60ch; }
 .note { font-size: 0.95rem; color: var(--muted); }
@@ -241,7 +237,7 @@ main:focus { outline: none; }
 .cam-bug { position: absolute; top: 8px; left: 8px; margin: 0; padding: 1px 10px 3px; background: var(--chrome); color: var(--bg); font-family: var(--display); font-size: clamp(0.72rem, 1.9vw, 1rem); text-transform: uppercase; letter-spacing: 0.03em; }
 .cam-tally { position: absolute; top: 8px; right: 8px; margin: 0; display: flex; align-items: center; gap: 7px; padding: 2px 10px; background: var(--bg); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .cam-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
-/* Tally light: on and off once every 1.2 seconds, well under 3 flashes a second. Reduced motion holds it steady. */
+/* Tally light: on and off once every 1.2 seconds, well under 3 flashes a second. Motion off holds it steady. */
 .cam-frame.is-live .cam-dot { background: var(--track-2); animation: tally 1.2s steps(1) infinite; }
 @keyframes tally { 50% { opacity: 0.2; } }
 .cam-lower { position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 12px 8px; background: var(--bg); border-top: var(--rule); }
@@ -459,22 +455,18 @@ section[id] { scroll-margin-top: 100px; }
 .mq-pause:hover { background: var(--fg); color: var(--bg); }
 .mq-icon { width: 10px; height: 12px; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
 .marquee.is-paused .mq-icon { border: 0; border-left: 10px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
-@media (prefers-reduced-motion: reduce) {
-  .mq-track { animation: none; width: auto; }
-  .mq-row { flex-wrap: wrap; row-gap: 4px; padding: 0 var(--gutter); }
-  .mq-row + .mq-row, .mq-pause { display: none; }
-}
+.motion-off .mq-track { animation: none; width: auto; }
+.motion-off .mq-row { flex-wrap: wrap; row-gap: 4px; padding: 0 var(--gutter); }
+.motion-off .mq-row + .mq-row, .motion-off .mq-pause { display: none; }
 
 /* ---------- content flows in on scroll ---------- */
-/* Hidden starting states only apply once app.js adds html.reveal-on, and never under reduced motion. */
-@media (prefers-reduced-motion: no-preference) {
-  .reveal-on .rv-words .rv-w { display: inline-block; opacity: 0; filter: blur(8px); transform: translateY(0.18em); transition: opacity 450ms ease, filter 450ms ease, transform 450ms cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--w, 0) * 60ms); }
-  .reveal-on .rv-words.rv-in .rv-w { opacity: 1; filter: none; transform: none; }
-  .reveal-on .rv-wipe .sp-photo { clip-path: inset(100% 0 0 0); transition: clip-path 550ms cubic-bezier(.2, .7, .2, 1); }
-  .reveal-on .rv-wipe.rv-in .sp-photo { clip-path: inset(0); }
-  .reveal-on .rv-stagger { opacity: 0; transform: translateY(14px); transition: opacity 450ms ease var(--rv-delay, 0ms), transform 450ms cubic-bezier(.2, .7, .2, 1) var(--rv-delay, 0ms), background-color 400ms ease; }
-  .reveal-on .rv-stagger.rv-in { opacity: 1; transform: none; }
-}
+/* Hidden starting states only apply once app.js adds html.reveal-on, and never with Motion off. */
+html.reveal-on:not(.motion-off) .rv-words .rv-w { display: inline-block; opacity: 0; filter: blur(8px); transform: translateY(0.18em); transition: opacity 450ms ease, filter 450ms ease, transform 450ms cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--w, 0) * 60ms); }
+html.reveal-on:not(.motion-off) .rv-words.rv-in .rv-w { opacity: 1; filter: none; transform: none; }
+html.reveal-on:not(.motion-off) .rv-wipe .sp-photo { clip-path: inset(100% 0 0 0); transition: clip-path 550ms cubic-bezier(.2, .7, .2, 1); }
+html.reveal-on:not(.motion-off) .rv-wipe.rv-in .sp-photo { clip-path: inset(0); }
+html.reveal-on:not(.motion-off) .rv-stagger { opacity: 0; transform: translateY(14px); transition: opacity 450ms ease var(--rv-delay, 0ms), transform 450ms cubic-bezier(.2, .7, .2, 1) var(--rv-delay, 0ms), background-color 400ms ease; }
+html.reveal-on:not(.motion-off) .rv-stagger.rv-in { opacity: 1; transform: none; }
 
 /* ---------- artist popup ---------- */
 html:has(dialog[open]) { overflow: hidden; }
@@ -538,3 +530,14 @@ html:has(dialog[open]) { overflow: hidden; }
 .player-now { margin: 8px 0 0; min-height: 1.4em; font-size: 0.9rem; color: var(--muted); }
 .player-note { margin: 12px 0 0; font-size: 0.85rem; color: var(--muted); }
 @media (min-width: 560px) { .player-deck { grid-template-columns: 150px 1fr; } }
+
+/* ---------- Motion toggle ---------- */
+/* Motion is on by default, whatever the OS setting. Off (html.motion-off) stills everything above. */
+.motion-toggle { appearance: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px 12px; border: var(--rule); background: transparent; color: var(--fg); font: inherit; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
+.motion-toggle:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.footer-motion { margin: 4px 0 0; }
+.header-motion { grid-area: motion; display: none; }
+@media (min-width: 1100px) {
+  .site-header { grid-template-columns: auto 1fr auto auto; grid-template-areas: "brand nav motion cta"; }
+  .header-motion { display: inline-flex; }
+}
