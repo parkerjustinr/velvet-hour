@@ -20,8 +20,8 @@ One-page event site. Plain HTML, CSS, vanilla JS. No framework, no build step. D
 - Featured speaker plus grid. Every lineup card, and every performer name or face in the run of show, opens the artist popup. The popup lists set times that switch the day tab and land on the slot.
 - Schedule day tabs (arrow keys work), track colors, "show my time" toggle (Intl API), per-day .ics download.
 - Ticket breakdown matrix: pick a column to choose a ticket, hover or focus a row for a side preview on desktop, tap a row to open it inline on phones. No sideways scroll on phones. Cost-per-day row is computed.
-- Demo registration with validation and a confirmation state. Nothing is sent anywhere.
-- "Bring someone" invite builder (demo, nothing is sent): gift or invite, email preview, sent state. Opens from the confirmation, the Tickets section and the Dance Cam. The Dance Cam photo stays in memory only. Copy lives in `invite` in data/event.json.
+- Demo registration with validation and a confirmation state. Nothing is sent anywhere. Your ticket is tier plus night (synced with the matrix), up to 5 guests each with their own ticket, a live order summary priced from data/event.json, and a confirmation listing every ticket.
+- Invite builder (demo, nothing is sent): "Invite a friend" (Tickets, Register, confirmation) and "Add to an invite" after a Dance Cam snapshot open invite mode; "Send [Name] their ticket" on the confirmation opens gift mode for that guest. Email preview, then a sent state. The Dance Cam photo stays in memory only. Copy lives in `invite` in data/event.json.
 - Skip link, visible focus, reduced-motion support.
 
 ## Rules

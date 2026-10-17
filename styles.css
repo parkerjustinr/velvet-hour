@@ -347,9 +347,7 @@ td.is-sel .yes { color: var(--gold); }
 .matrix tfoot th { text-align: left; font-weight: 800; }
 .matrix tfoot td { font-weight: 700; }
 .matrix-cta { display: grid; gap: 10px; justify-items: start; }
-.gift-line { margin: 4px 0 0; }
-.gift-link { appearance: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-.gift-link:hover { color: var(--gold); }
+.matrix-cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* Phones: every row stacks - label on top, one small cell per tier underneath. No sideways scroll. */
 @media (max-width: 879px) {
@@ -399,6 +397,23 @@ td.is-sel .yes { color: var(--gold); }
 
 /* ---------- registration: form on a raised panel ---------- */
 .sec-register .wrap { display: grid; gap: 0 48px; }
+.reg-invite { margin-bottom: 18px; }
+/* Guests: one block per guest inside the form panel, separated by a rule. */
+.guests { display: grid; gap: 20px; }
+.guests:empty { display: none; }
+.guest { display: grid; gap: 16px; margin: 0; padding: 18px 0 0; border: 0; border-top: var(--rule); min-width: 0; }
+.guest legend { float: left; width: 100%; padding: 0; margin-bottom: 2px; font-family: var(--display); font-size: 1.4rem; line-height: 1.1; }
+.guest-remove { justify-self: start; }
+.guest-add { display: grid; gap: 8px; justify-items: start; }
+.guest-add .btn[hidden] { display: none; }
+.guest-add .hint { margin: 0; }
+/* Order summary: beside the form on desktop, below it on phones. */
+.order { margin-top: 24px; padding-top: 14px; border-top: var(--rule); max-width: 760px; }
+.order[hidden] { display: none; }
+.order h3 { font-size: 1.6rem; margin-bottom: 10px; }
+.order-lines li { padding: 7px 0; border-bottom: var(--hair); }
+.ol-who { font-weight: 700; }
+.order-total { display: flex; gap: 10px; align-items: baseline; margin: 10px 0 0; font-size: 1.2rem; }
 .demo { font-size: 0.95rem; color: var(--muted); max-width: 760px; }
 .reg-form { display: grid; gap: 20px; max-width: 760px; background: var(--bg-2); padding: 20px 16px; border: var(--rule); }
 .field { display: grid; gap: 6px; }
@@ -419,12 +434,20 @@ td.is-sel .yes { color: var(--gold); }
 .confirm h3 { font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 8px; }
 .confirm-dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin-bottom: 14px; }
 .confirm-dl dt { font-weight: 700; }
-#confirm-gifts:empty { display: none; }
+/* Every ticket in the order, yours first; guests with an email get a send button. */
+.confirm-tickets { margin: 0 0 12px; border-top: var(--hair); }
+.confirm-tickets li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 10px 0; border-bottom: var(--hair); }
+.ct-who { font-weight: 700; }
+.ct-send { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; flex-basis: 100%; margin-top: 6px; }
+.ct-status { color: var(--muted); font-size: 0.95rem; }
+.ct-status:empty { display: none; }
+.confirm-total { display: flex; gap: 10px; align-items: baseline; font-size: 1.15rem; }
 .confirm-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (min-width: 960px) {
   .sec-register .wrap { grid-template-columns: 4fr 7fr; }
-  .sec-register .section-title, .sec-register .lede, .sec-register .demo { grid-column: 1; }
-  .sec-register #reg-out { grid-column: 2; grid-row: 1 / span 4; }
+  .sec-register .section-title, .sec-register .lede, .sec-register .demo, .sec-register .reg-invite, .sec-register .order { grid-column: 1; }
+  .sec-register #reg-out { grid-column: 2; grid-row: 1 / span 7; }
+  .sec-register .order { align-self: start; }
 }
 
 /* ---------- FAQ: heading holds on the left, answers on the right ---------- */
@@ -554,16 +577,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .inv-title:focus { outline: none; }
 .inv-form { display: grid; gap: 18px; }
 .inv-form [hidden] { display: none; }
-.inv-type { display: grid; grid-template-columns: 1fr 1fr; border: var(--rule); padding: 0; margin: 0; }
-.inv-type legend { padding: 0 0 8px; font-weight: 700; }
-.inv-type label { position: relative; display: block; cursor: pointer; }
-.inv-type label + label { border-left: var(--rule); }
-.inv-type input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.inv-type span { display: block; height: 100%; padding: 12px 14px; font-weight: 700; transition: background-color 200ms ease, color 200ms ease; }
-.inv-type label:hover span { background: var(--bg-2); }
-.inv-type input:checked + span { background: var(--gold); color: var(--on-gold); }
-.inv-type input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
-.inv-price { margin: 6px 0 0; font-weight: 700; }
+.inv-fixed { margin: 0; padding: 12px 14px; background: var(--bg-2); font-weight: 700; }
+.inv-fixed span { display: block; font-weight: 400; color: var(--muted); font-size: 0.9rem; }
 .inv-count { margin: -12px 0 0; }
 .inv-photo { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; padding: 12px; background: var(--bg-2); }
 .inv-photo img { width: 96px; height: auto; transform: rotate(-2deg); }

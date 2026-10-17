@@ -274,7 +274,12 @@
       {"id": "r-after", "group": "Extras", "label": "Afterparty", "from": "session:n1-after,session:n2-after", "tiers": {"balcony": "no", "floor": "no", "rail": "no", "vip": "yes", "both": "no"}},
       {"id": "r-merch", "group": "Extras", "label": "Merch", "detail": "Picked up at the merch desk. Front Rail and Both nights get the tour tee. Soundcheck VIP gets the tee and a numbered screen-printed poster.", "tiers": {"balcony": "no", "floor": "no", "rail": "Tee", "vip": "Tee and poster", "both": "Tee"}}
     ],
-    "footnote": "Prices include fees. Tickets can be transferred until 48 hours before the show."
+    "footnote": "Prices include fees. Tickets can be transferred until 48 hours before the show.",
+    "bothNights": {
+      "label": "Both nights",
+      "night": "Slow Burn and Full Funk",
+      "date": "Nov 20 and 21"
+    }
   },
 
   "sponsors": {
@@ -339,7 +344,29 @@
       {"id": "request", "label": "A song you want the DJ to play", "type": "text", "required": false},
       {"id": "access", "label": "Access needs", "type": "textarea", "required": false, "hint": "Seating, step-free routes, a companion ticket, anything we should plan for."}
     ],
-    "confirmation": "Your tickets arrive by email two weeks before the show. Bring the QR code and a photo ID. Dance Floor and Both nights holders are entered in that night's front rail draw when they scan in."
+    "confirmation": "Your tickets arrive by email two weeks before the show. Bring the QR code and a photo ID. Dance Floor and Both nights holders are entered in that night's front rail draw when they scan in.",
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "ticketLabel": "Your ticket",
+    "addGuest": "+ Add a guest",
+    "maxGuests": 5,
+    "maxNote": "That's the most for one order: {max} guests.",
+    "guestLabel": "Guest {n}",
+    "guestName": "Name",
+    "guestEmail": "Email",
+    "guestEmailHint": "(optional, needed to send them their ticket)",
+    "guestTicket": "Ticket",
+    "remove": "Remove",
+    "summaryTitle": "Your order",
+    "you": "You",
+    "total": "Total",
+    "submitOne": "Register 1 ticket",
+    "submitMany": "Register {n} tickets, {total}",
+    "errName": "Enter your name.",
+    "errEmail": "Enter your email.",
+    "errEmailFormat": "Check the email format, for example name@example.com.",
+    "errGuestName": "Enter a name for {guest}.",
+    "errGuestEmail": "Check the email format for {guest}, for example name@example.com."
   },
 
   "faq": {
@@ -368,18 +395,13 @@
   },
 
   "invite": {
-    "title": "Bring someone",
     "previewTitle": "Here's what they'll get",
     "sentTitle": "Invite sent to {them}.",
     "close": "Close",
-    "typeLegend": "What are you sending?",
-    "typeGift": "I got them a ticket",
-    "typeInvite": "Invite them to get one",
     "you": "Your name",
     "them": "Their name",
     "email": "Their email",
-    "ticket": "Which ticket",
-    "priceLine": "Price: {price}",
+    "ticket": "Ticket",
     "night": "Which night are you going?",
     "note": "Personal note",
     "optional": "(optional)",
@@ -406,23 +428,18 @@
     "inviteButton": "Get your ticket",
     "admit": "Admit one",
     "stubLabel": "Ticket stub",
-    "bothNights": {
-      "label": "Both nights",
-      "night": "Slow Burn and Full Funk",
-      "date": "Nov 20 and 21"
-    },
     "sentDemo": "Demo: no email was actually sent.",
     "another": "Send another",
     "done": "Done",
-    "giftLabel": "Gift",
-    "giftEntry": "{tier}, {night} for {them}, {price}",
     "errYou": "Enter your name.",
     "errThem": "Enter their name.",
     "errEmail": "Enter their email.",
     "errEmailFormat": "Check the email format, for example name@example.com.",
-    "ticketsLine": "Buying for someone else?",
-    "ticketsLink": "Send it as a gift.",
-    "confirmButton": "Bring someone",
-    "camButton": "Add to an invite"
+    "camButton": "Add to an invite",
+    "titleInvite": "Invite a friend",
+    "titleGift": "Send {them} their ticket",
+    "inviteFriend": "Invite a friend",
+    "sendGuest": "Send {name} their ticket",
+    "guestSent": "Sent to {email}."
   }
 }

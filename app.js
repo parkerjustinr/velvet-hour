@@ -318,8 +318,8 @@
     return sectionShell("tickets", t.heading,
       (t.intro ? '<p class="lede">' + copy(t.intro) + "</p>" : "") +
       '<fieldset class="matrix-wrap"><legend class="sr">Choose a ticket</legend><div class="matrix-layout">' + table + preview + "</div></fieldset>" +
-      '<div class="matrix-cta"><a class="btn btn-primary" href="#register" id="tier-cta"></a>' +
-      (D.invite ? '<p class="gift-line">' + esc(D.invite.ticketsLine) + ' <button type="button" class="gift-link" data-invite-open="gift">' + esc(D.invite.ticketsLink) + "</button></p>" : "") +
+      '<div class="matrix-cta"><div class="matrix-cta-row"><a class="btn btn-primary" href="#register" id="tier-cta"></a>' +
+      (D.invite ? '<button type="button" class="btn" data-invite-open="invite">' + esc(D.invite.inviteFriend) + "</button>" : "") + "</div>" +
       (t.footnote ? '<p class="note">' + copy(t.footnote) + "</p>" : "") + "</div>");
   };
 
@@ -343,8 +343,7 @@
   };
 
   R.register = function () {
-    var r = D.registration, t = D.tickets;
-    var opts = t.tiers.map(function (x) { return '<option value="' + x.id + '">' + esc(x.name) + " - " + esc(x.price) + "</option>"; }).join("");
+    var r = D.registration;
     var extras = (r.extraFields || []).map(function (f) {
       var hint = f.hint ? '<span class="hint" id="h-' + f.id + '">' + esc(f.hint) + "</span>" : "";
       var desc = f.hint ? ' aria-describedby="h-' + f.id + '"' : "";
@@ -355,15 +354,23 @@
     }).join("");
     return sectionShell("register", r.heading,
       (r.intro ? '<p class="lede">' + copy(r.intro) + "</p>" : "") +
+      (D.invite ? '<div class="reg-invite"><button type="button" class="btn" data-invite-open="invite">' + esc(D.invite.inviteFriend) + "</button></div>" : "") +
       '<p class="demo" role="note">' + esc(r.demoNotice) + "</p>" +
       '<div id="reg-out"><form class="reg-form" id="reg-form" novalidate>' +
-        '<div class="field"><label for="f-tier">Ticket</label><select id="f-tier" name="tier">' + opts + "</select></div>" +
         '<div class="two-col">' +
-          '<div class="field"><label for="f-name">Full name</label><input type="text" id="f-name" name="name" autocomplete="name" required aria-describedby="e-name"><span class="error" id="e-name"></span></div>' +
-          '<div class="field"><label for="f-email">Email</label><input type="email" id="f-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="e-email"><span class="error" id="e-email"></span></div>' +
-        "</div>" + extras +
-        '<button type="submit" class="btn btn-primary" id="reg-submit">Register</button>' +
-      "</form></div>");
+          '<div class="field"><label for="f-name">' + esc(r.nameLabel) + '</label><input type="text" id="f-name" name="name" autocomplete="name" required aria-describedby="e-name"><span class="error" id="e-name"></span></div>' +
+          '<div class="field"><label for="f-email">' + esc(r.emailLabel) + '</label><input type="email" id="f-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="e-email"><span class="error" id="e-email"></span></div>' +
+        "</div>" +
+        '<div class="field"><label for="f-tier">' + esc(r.ticketLabel) + "</label>" + ticketSelect("f-tier", "tier", ticketForTier(state.tier)) + "</div>" +
+        '<div class="guests" id="guests"></div>' +
+        '<div class="guest-add"><button type="button" class="btn btn-small" id="add-guest">' + esc(r.addGuest) + "</button>" +
+          '<p class="hint" id="guest-max" hidden>' + esc(fill(r.maxNote, { max: r.maxGuests })) + "</p></div>" +
+        extras +
+        '<button type="submit" class="btn btn-primary" id="reg-submit">' + esc(r.submitOne) + "</button>" +
+      "</form></div>" +
+      '<aside class="order" id="order" aria-labelledby="order-title"><h3 id="order-title">' + esc(r.summaryTitle) + "</h3>" +
+        '<ul class="order-lines" id="order-lines"></ul>' +
+        '<p class="order-total" aria-live="polite"><span>' + esc(r.total) + '</span> <strong id="order-total"></strong></p></aside>');
   };
 
   R.faq = function () {
@@ -1097,20 +1104,22 @@
     });
   }
 
-  // ---------- "Bring someone" invite builder ----------
-  // A demo: nothing is sent. Three steps in one <dialog>: build, preview (the email as it would land on a
-  // phone), sent. Opened from the registration confirmation, the Tickets section and the Dance Cam.
-  // The Dance Cam photo is kept in memory only, as a blob URL, and never uploaded or stored.
-  var inv = { type: "invite", you: "", them: "", email: "", ticket: "", night: "", note: "", includePhoto: false, step: 1, gifts: [] };
+  // ---------- invite builder ----------
+  // A demo: nothing is sent. One <dialog>, three steps: build, preview (the email as it would land on a
+  // phone), sent. Invite mode ("Invite a friend", or "Add to an invite" after a Dance Cam snapshot): they
+  // get an invite to buy their own ticket. Gift mode is only reached from a guest ticket on the
+  // registration confirmation ("Send [Name] their ticket"). The Dance Cam photo is kept in memory only,
+  // as a blob URL, and never uploaded or stored.
+  var inv = { type: "invite", you: "", them: "", email: "", ticket: "", night: "", note: "", includePhoto: false, step: 1, guest: null };
   var invDlg = null, invOpener = null, invPendingPhoto = false, invPhotoUrl = null;
   function fill(tpl, v) { return String(tpl || "").replace(/\{(\w+)\}/g, function (m, k) { return v[k] != null ? v[k] : m; }); }
   function nightInfo(id) {
-    var I = D.invite;
-    if (id === "all") return { label: I.bothNights.label, night: I.bothNights.night, date: I.bothNights.date };
+    var B = D.tickets.bothNights;
+    if (id === "all") return { label: B.label, night: B.night, date: B.date };
     var day = byId(D.schedule.days, id), item = (D.hero.nights.items || []).filter(function (n) { return n.day === id; })[0];
     return { label: day.label, night: item ? item.name : day.label, date: day.title };
   }
-  // Gift options: every single-night tier on every night, plus passes that cover all nights.
+  // Ticket options, the same as the matrix: every single-night tier on every night, plus passes that cover all nights.
   function ticketOptions() {
     var out = [];
     D.tickets.tiers.forEach(function (t) {
@@ -1122,6 +1131,7 @@
   function ticketFor(value) {
     return ticketOptions().filter(function (o) { return o.value === value; })[0] || ticketOptions()[0];
   }
+  function ticketLabel(value) { var o = ticketFor(value); return o.tier.name + ", " + nightInfo(o.night).label + ", " + o.tier.price; }
   // Called by the Dance Cam each time a snapshot is made.
   function setInvitePhoto(blob) {
     if (invPhotoUrl) URL.revokeObjectURL(invPhotoUrl);
@@ -1131,8 +1141,7 @@
   }
 
   function wireInvites() {
-    var I = D.invite;
-    if (!I) return;
+    if (!D.invite) return;
     invDlg = document.createElement("dialog");
     if (typeof invDlg.showModal !== "function") { invDlg = null; return; }
     invDlg.className = "invite";
@@ -1149,34 +1158,38 @@
       if (e.target.closest(".inv-take")) { takePhotoNow(); return; }
       if (e.target.closest(".inv-edit")) { show(1, "#inv-them"); return; }
       if (e.target.closest(".inv-send")) { send(); return; }
-      if (e.target.closest(".inv-another")) { inv.them = ""; inv.email = ""; inv.note = ""; inv.sent = false; show(1, "#inv-them"); }
+      if (e.target.closest(".inv-another")) { fresh(); show(1, "#inv-them"); }
     });
     invDlg.addEventListener("submit", function (e) { e.preventDefault(); if (validate()) show(2); });
-    invDlg.addEventListener("input", function (e) { if (e.target.closest("form")) { read(); if (e.target.id === "inv-note") counter(); if (e.target.id === "inv-ticket") price(); } });
-    invDlg.addEventListener("change", function (e) { if (e.target.name === "inv-type") { read(); toggleType(); } });
+    invDlg.addEventListener("input", function (e) { if (e.target.closest("form")) { read(); if (e.target.id === "inv-note") counter(); } });
     invDlg.addEventListener("close", function () {
       if (invOpener && document.contains(invOpener) && !invPendingPhoto) invOpener.focus();
     });
   }
+  // A new invite to buy their own ticket, keeping your name, your night and the photo.
+  function fresh() { inv.type = "invite"; inv.guest = null; inv.them = ""; inv.email = ""; inv.note = ""; inv.sent = false; }
 
-  // type: "gift", "invite" or "photo" (from the Dance Cam: keep the type, include the photo).
-  function openInvite(type, from, resume) {
+  // mode: "invite", "photo" (invite with the Dance Cam photo attached) or "guest:<n>" (gift: send guest n their ticket).
+  function openInvite(mode, from, resume) {
     if (!invDlg) return;
     if (!resume) {
       invPendingPhoto = false;
       invOpener = from;
-      if (type === "gift" || type === "invite") inv.type = type;
-      if (type === "photo" && invPhotoUrl) inv.includePhoto = true;
-      // After a finished send, the next invite starts with a fresh recipient.
-      if (inv.sent) { inv.them = ""; inv.email = ""; inv.note = ""; inv.sent = false; }
-      // Each new registration prefills your name and, for a two-night pass, the night you're going.
+      // Each new registration prefills your name and the night you're going.
       if (state.reg && inv.regFor !== state.reg) {
         inv.regFor = state.reg;
         inv.you = state.reg.name;
-        if (state.reg.tier.days > 1) inv.night = "all";
+        inv.night = ticketFor(state.reg.ticket).night;
       }
-      if (!inv.ticket) inv.ticket = (state.tier && byId(D.tickets.tiers, state.tier) && byId(D.tickets.tiers, state.tier).days > 1) ? state.tier + "|all" : (state.tier || D.tickets.tiers[0].id) + "|" + D.schedule.days[0].id;
-      if (!inv.night) inv.night = state.reg && state.reg.tier.days > 1 ? "all" : D.schedule.days[0].id;
+      if (!inv.night) inv.night = D.schedule.days[0].id;
+      var g = /^guest:(\d+)$/.exec(mode || ""), guest = g && state.reg && state.reg.guests[+g[1]];
+      if (guest) {
+        inv.type = "gift"; inv.guest = +g[1]; inv.sent = false;
+        inv.them = guest.name; inv.email = guest.email; inv.ticket = guest.ticket; inv.note = "";
+      } else {
+        if (inv.type === "gift" || inv.sent) fresh();
+        if (mode === "photo" && invPhotoUrl) inv.includePhoto = true;
+      }
     }
     if (!invDlg.open) invDlg.showModal();
     show(1, resume ? "#inv-photo" : null);
@@ -1197,12 +1210,10 @@
   function read() {
     var f = invDlg.querySelector("form");
     if (!f) return;
-    inv.type = f.elements["inv-type"].value || inv.type;
     inv.you = f.elements["inv-you"].value.trim();
     inv.them = f.elements["inv-them"].value.trim();
     inv.email = f.elements["inv-email"].value.trim();
-    inv.ticket = f.elements["inv-ticket"].value;
-    inv.night = f.elements["inv-night"].value;
+    if (f.elements["inv-night"]) inv.night = f.elements["inv-night"].value;
     inv.note = f.elements["inv-note"].value;
     var ph = f.elements["inv-photo"];
     inv.includePhoto = !!(ph && ph.checked && invPhotoUrl);
@@ -1219,7 +1230,7 @@
     }
     check("inv-you", inv.you ? "" : I.errYou);
     check("inv-them", inv.them ? "" : I.errThem);
-    check("inv-email", !inv.email ? I.errEmail : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inv.email) ? "" : I.errEmailFormat));
+    check("inv-email", !inv.email ? I.errEmail : (EMAIL_RE.test(inv.email) ? "" : I.errEmailFormat));
     if (first) first.focus();
     return !first;
   }
@@ -1229,11 +1240,7 @@
       '<span class="error" id="' + id + '-err"></span></div>';
   }
   function stepOne() {
-    var I = D.invite;
-    var tickets = ticketOptions().map(function (o) {
-      var n = nightInfo(o.night);
-      return '<option value="' + o.value + '"' + (o.value === inv.ticket ? " selected" : "") + ">" + esc(o.tier.name + ", " + n.label + ", " + o.tier.price) + "</option>";
-    }).join("");
+    var I = D.invite, gift = inv.type === "gift";
     var nights = D.schedule.days.map(function (d) { return d.id; }).concat("all").map(function (id) {
       return '<option value="' + id + '"' + (id === inv.night ? " selected" : "") + ">" + esc(nightInfo(id).label) + "</option>";
     }).join("");
@@ -1241,18 +1248,13 @@
       ? '<div class="inv-photo"><img src="' + invPhotoUrl + '" alt="' + esc(I.photoAlt) + '"><label class="inv-check"><input type="checkbox" id="inv-photo" name="inv-photo"' + (inv.includePhoto ? " checked" : "") + "> " + esc(I.photo) + "</label></div>"
       : '<div class="inv-photo is-empty"><p>' + esc(I.noPhoto) + '</p><button type="button" class="btn btn-small inv-take">' + esc(I.takePhoto) + "</button></div>";
     return '<form class="inv-form" novalidate>' +
-      '<fieldset class="inv-type"><legend>' + esc(I.typeLegend) + "</legend>" +
-        '<label><input type="radio" name="inv-type" value="gift"' + (inv.type === "gift" ? " checked" : "") + "><span>" + esc(I.typeGift) + "</span></label>" +
-        '<label><input type="radio" name="inv-type" value="invite"' + (inv.type === "invite" ? " checked" : "") + "><span>" + esc(I.typeInvite) + "</span></label>" +
-      "</fieldset>" +
+      (gift ? '<p class="inv-fixed"><span>' + esc(I.ticket) + "</span> " + esc(ticketLabel(inv.ticket)) + "</p>" : "") +
       field("inv-you", I.you, '<input type="text" id="inv-you" name="inv-you" autocomplete="name" required aria-describedby="inv-you-err" value="' + esc(inv.you) + '">') +
       '<div class="two-col">' +
         field("inv-them", I.them, '<input type="text" id="inv-them" name="inv-them" required aria-describedby="inv-them-err" value="' + esc(inv.them) + '">') +
         field("inv-email", I.email, '<input type="email" id="inv-email" name="inv-email" inputmode="email" required aria-describedby="inv-email-err" value="' + esc(inv.email) + '">') +
       "</div>" +
-      '<div class="inv-gift-only">' + field("inv-ticket", I.ticket, '<select id="inv-ticket" name="inv-ticket" aria-describedby="inv-price">' + tickets + "</select>") +
-        '<p class="inv-price" id="inv-price" aria-live="polite"></p></div>' +
-      '<div class="inv-invite-only">' + field("inv-night", I.night, '<select id="inv-night" name="inv-night">' + nights + "</select>") + "</div>" +
+      (gift ? "" : field("inv-night", I.night, '<select id="inv-night" name="inv-night">' + nights + "</select>")) +
       field("inv-note", I.note, '<textarea id="inv-note" name="inv-note" maxlength="140" aria-describedby="inv-count">' + esc(inv.note) + "</textarea>", I.optional) +
       '<p class="hint inv-count" id="inv-count"></p>' +
       photo +
@@ -1286,7 +1288,8 @@
   function show(step, focusSel) {
     var I = D.invite;
     inv.step = step;
-    var title = step === 1 ? I.title : step === 2 ? I.previewTitle : fill(I.sentTitle, { them: inv.them });
+    var title = step === 1 ? (inv.type === "gift" ? fill(I.titleGift, { them: inv.them }) : I.titleInvite)
+      : step === 2 ? I.previewTitle : fill(I.sentTitle, { them: inv.them });
     var body = step === 1 ? stepOne()
       : step === 2 ? '<div class="inv-preview">' + emailHtml() + '<div class="inv-side"><p>' + esc(I.previewHint) + "</p>" +
           '<div class="inv-actions"><button type="button" class="btn inv-edit">' + esc(I.edit) + '</button><button type="button" class="btn btn-primary inv-send">' + esc(I.send) + "</button></div></div></div>"
@@ -1297,35 +1300,37 @@
       '<button type="button" class="artist-close inv-close" aria-label="' + esc(I.close) + '"><span aria-hidden="true">&times;</span></button>' +
       '<h2 class="inv-title" id="inv-title" tabindex="-1">' + esc(title) + "</h2>" + body + "</div>";
     rollify(invDlg);
-    if (step === 1) { toggleType(); counter(); price(); }
+    if (step === 1) counter();
     var target = focusSel ? invDlg.querySelector(focusSel) : null;
     if (!target && invDlg.open) target = $("inv-title");
     if (target) setTimeout(function () { target.focus(); }, 0);
     invDlg.scrollTop = 0;
   }
-  function toggleType() {
-    var gift = inv.type === "gift";
-    invDlg.querySelector(".inv-gift-only").hidden = !gift;
-    invDlg.querySelector(".inv-invite-only").hidden = gift;
-  }
   function counter() { var el = $("inv-count"); if (el) el.textContent = fill(D.invite.counter, { n: $("inv-note").value.length, max: 140 }); }
-  function price() { var el = $("inv-price"); if (el) el.textContent = fill(D.invite.priceLine, { price: ticketFor($("inv-ticket").value).tier.price }); }
   function send() {
-    if (inv.type === "gift") {
-      var t = ticketFor(inv.ticket);
-      inv.gifts.push({ them: inv.them, tier: t.tier.name, night: nightInfo(t.night).label, price: t.tier.price });
-      renderGifts();
+    if (inv.type === "gift" && inv.guest != null && state.reg && state.reg.guests[inv.guest]) {
+      state.reg.guests[inv.guest].sentTo = inv.email;
+      markGuestSent(inv.guest);
     }
     inv.sent = true;
     show(3);
   }
-  // Gifts appear in the registration confirmation summary (now, or once the visitor registers).
-  function renderGifts() {
-    var el = $("confirm-gifts");
-    if (!el) return;
-    el.innerHTML = inv.gifts.map(function (g) {
-      return "<dt>" + esc(D.invite.giftLabel) + "</dt><dd>" + esc(fill(D.invite.giftEntry, g)) + "</dd>";
-    }).join("");
+
+  // ---------- registration: your ticket, guests, order summary ----------
+  // Prices come from data/event.json (tickets.tiers), so the summary always matches the matrix.
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function dollars(n) { return "$" + n; }
+  function ticketSelect(id, name, value, attrs) {
+    return '<select id="' + id + '" name="' + name + '"' + (attrs || "") + ">" + ticketOptions().map(function (o) {
+      return '<option value="' + o.value + '"' + (o.value === value ? " selected" : "") + ">" + esc(ticketLabel(o.value)) + "</option>";
+    }).join("") + "</select>";
+  }
+  // Your ticket follows the matrix column; a single night keeps the night already chosen.
+  function ticketForTier(tierId, current) {
+    var t = byId(D.tickets.tiers, tierId) || D.tickets.tiers[0];
+    if (t.days > 1) return t.id + "|all";
+    var night = current ? current.split("|")[1] : "";
+    return t.id + "|" + (night && night !== "all" ? night : D.schedule.days[0].id);
   }
 
   // ---------- wiring ----------
@@ -1369,8 +1374,9 @@
     }
     var cta = $("tier-cta");
     if (cta && tier) { cta.innerHTML = "Register with " + esc(tier.name) + ", " + esc(tier.price) + ' <span class="arrow" aria-hidden="true">&rarr;</span>'; rollOne(cta); }
+    // The registration ticket follows the matrix column (keeping its night) and updates the order summary.
     var sel = $("f-tier");
-    if (sel) sel.value = id;
+    if (sel && sel.value.split("|")[0] !== id) { sel.value = ticketForTier(id, sel.value); sel.dispatchEvent(new Event("input", { bubbles: true })); }
   }
 
   function wireMatrix() {
@@ -1398,13 +1404,76 @@
     setTier(state.tier);
   }
 
+  // Registration: your details and ticket, up to registration.maxGuests guests, a live order summary.
   function wireForm() {
     var form = $("reg-form");
     if (!form) return;
-    form.elements.tier.addEventListener("change", function () { setTier(form.elements.tier.value); });
-    if (state.tier) form.elements.tier.value = state.tier;
+    var r = D.registration, guests = [];
+    function guestName(g, i) { return g.name.trim() || fill(r.guestLabel, { n: i + 1 }); }
+    function readGuests() {
+      guests = guests.map(function (g, i) {
+        return { name: $("g" + i + "-name").value, email: $("g" + i + "-email").value, ticket: $("g" + i + "-ticket").value };
+      });
+    }
+    function guestHtml(g, i) {
+      var label = fill(r.guestLabel, { n: i + 1 }), id = "g" + i;
+      return '<fieldset class="guest" id="' + id + '"><legend>' + esc(label) + "</legend>" +
+        '<div class="two-col">' +
+          '<div class="field"><label for="' + id + '-name">' + esc(r.guestName) + '</label><input type="text" id="' + id + '-name" required aria-describedby="' + id + '-name-err" value="' + esc(g.name) + '"><span class="error" id="' + id + '-name-err"></span></div>' +
+          '<div class="field"><label for="' + id + '-email">' + esc(r.guestEmail) + ' <span class="opt">' + esc(r.guestEmailHint) + '</span></label><input type="email" id="' + id + '-email" inputmode="email" aria-describedby="' + id + '-email-err" value="' + esc(g.email) + '"><span class="error" id="' + id + '-email-err"></span></div>' +
+        "</div>" +
+        '<div class="field"><label for="' + id + '-ticket">' + esc(r.guestTicket) + "</label>" + ticketSelect(id + "-ticket", id + "-ticket", g.ticket) + "</div>" +
+        '<button type="button" class="btn btn-small guest-remove" data-remove="' + i + '">' + esc(r.remove) + '<span class="sr"> ' + esc(label) + "</span></button>" +
+      "</fieldset>";
+    }
+    function renderGuests(focusId) {
+      $("guests").innerHTML = guests.map(guestHtml).join("");
+      rollify($("guests"));
+      var full = guests.length >= r.maxGuests;
+      $("add-guest").hidden = full;
+      $("guest-max").hidden = !full;
+      summary();
+      var f = focusId && $(focusId);
+      if (f) f.focus();
+    }
+    // One line per ticket, a total, and a submit label that matches.
+    function summary() {
+      var lines = [{ who: r.you, ticket: form.elements.tier.value }].concat(guests.map(function (g, i) {
+        return { who: guestName(g, i), ticket: g.ticket };
+      }));
+      var total = 0;
+      $("order-lines").innerHTML = lines.map(function (l) {
+        var t = ticketFor(l.ticket);
+        total += priceNum(t.tier.price);
+        return "<li><span class=\"ol-who\">" + esc(l.who) + ":</span> " + esc(ticketLabel(l.ticket)) + "</li>";
+      }).join("");
+      $("order-total").textContent = dollars(total);
+      setLabel($("reg-submit"), esc(lines.length === 1 ? r.submitOne : fill(r.submitMany, { n: lines.length, total: dollars(total) })));
+    }
+    $("add-guest").addEventListener("click", function () {
+      readGuests();
+      if (guests.length >= r.maxGuests) return;
+      guests.push({ name: "", email: "", ticket: form.elements.tier.value });
+      renderGuests("g" + (guests.length - 1) + "-name");
+    });
+    $("guests").addEventListener("click", function (e) {
+      var b = e.target.closest(".guest-remove");
+      if (!b) return;
+      readGuests();
+      var i = +b.getAttribute("data-remove");
+      guests.splice(i, 1);
+      renderGuests(guests.length ? "g" + Math.min(i, guests.length - 1) + "-name" : "add-guest");
+    });
+    form.addEventListener("input", function (e) { if (e.target.closest(".guest")) readGuests(); summary(); });
+    form.addEventListener("change", function (e) {
+      if (e.target === form.elements.tier) setTier(form.elements.tier.value.split("|")[0]);
+      if (e.target.closest(".guest")) readGuests();
+      summary();
+    });
+    summary();
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      readGuests();
       var first = null;
       function check(el, errId, msg) {
         el.setAttribute("aria-invalid", msg ? "true" : "false");
@@ -1412,35 +1481,57 @@
         if (msg && !first) first = el;
       }
       var name = form.elements.name, email = form.elements.email, ev = email.value.trim();
-      check(name, "e-name", name.value.trim() ? "" : "Enter your name.");
-      check(email, "e-email", !ev ? "Enter your email." : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev) ? "" : "Check the email format, for example name@example.com."));
+      check(name, "e-name", name.value.trim() ? "" : r.errName);
+      check(email, "e-email", !ev ? r.errEmail : (EMAIL_RE.test(ev) ? "" : r.errEmailFormat));
+      guests.forEach(function (g, i) {
+        var label = fill(r.guestLabel, { n: i + 1 }), ge = g.email.trim();
+        check($("g" + i + "-name"), "g" + i + "-name-err", g.name.trim() ? "" : fill(r.errGuestName, { guest: label }));
+        check($("g" + i + "-email"), "g" + i + "-email-err", !ge || EMAIL_RE.test(ge) ? "" : fill(r.errGuestEmail, { guest: label }));
+      });
       if (first) { first.focus(); return; }
-      confirm({ name: name.value.trim(), email: ev, tier: byId(D.tickets.tiers, form.elements.tier.value) });
+      confirm({
+        name: name.value.trim(), email: ev, ticket: form.elements.tier.value, tier: ticketFor(form.elements.tier.value).tier,
+        guests: guests.map(function (g) { return { name: g.name.trim(), email: g.email.trim(), ticket: g.ticket }; })
+      });
     });
   }
 
+  // The calendar days for one ticket: its night, or every night a pass covers.
+  function daysForTicket(value) {
+    var o = ticketFor(value);
+    return o.night === "all" ? daysForTier(o.tier.id) : D.schedule.days.filter(function (d) { return d.id === o.night; });
+  }
   function daysForTier(tierId) {
     return D.schedule.days.filter(function (day) {
       return day.sessions.some(function (s) { return !s.tiers || s.tiers.indexOf(tierId) > -1; });
     });
   }
 
+  // The confirmation lists every ticket in the order, yours first. Guests with an email get a
+  // "Send [Name] their ticket" button that opens the invite builder in gift mode.
   function confirm(rec) {
-    var r = D.registration, days = daysForTier(rec.tier.id);
+    var r = D.registration, I = D.invite, days = daysForTicket(rec.ticket), total = priceNum(rec.tier.price);
     state.reg = rec;
+    var lines = '<li><span class="ct-who">' + esc(r.you) + ':</span> <span class="ct-what">' + esc(ticketLabel(rec.ticket)) + "</span></li>" +
+      rec.guests.map(function (g, i) {
+        total += priceNum(ticketFor(g.ticket).tier.price);
+        return '<li><span class="ct-who">' + esc(g.name) + ':</span> <span class="ct-what">' + esc(ticketLabel(g.ticket)) + "</span>" +
+          (g.email && I ? '<span class="ct-send"><button type="button" class="btn btn-small" data-invite-open="guest:' + i + '">' + esc(fill(I.sendGuest, { name: g.name })) + "</button>" +
+            '<span class="ct-status" id="guest-status-' + i + '"></span></span>' : "") + "</li>";
+      }).join("");
     $("reg-out").innerHTML =
       '<div class="confirm" role="status" tabindex="-1" id="reg-confirm">' +
         '<h3>You\'re registered.</h3><p class="confirm-demo">Demo confirmation. Nothing was sent anywhere.</p>' +
-        '<dl class="confirm-dl"><dt>Name</dt><dd>' + esc(rec.name) + "</dd><dt>Email</dt><dd>" + esc(rec.email) +
-        "</dd><dt>Ticket</dt><dd>" + esc(rec.tier.name) + ", " + esc(rec.tier.price) + "</dd></dl>" +
-        '<dl class="confirm-dl" id="confirm-gifts"></dl>' +
+        '<dl class="confirm-dl"><dt>Name</dt><dd>' + esc(rec.name) + "</dd><dt>Email</dt><dd>" + esc(rec.email) + "</dd></dl>" +
+        '<ul class="confirm-tickets">' + lines + "</ul>" +
+        '<p class="confirm-total"><span>' + esc(r.total) + "</span> <strong>" + dollars(total) + "</strong></p>" +
         "<p>" + copy(r.confirmation) + "</p>" +
         '<div class="confirm-actions">' + days.map(function (d) {
           return '<button type="button" class="btn btn-small" data-ics-day="' + d.id + '" data-ics-tier="' + rec.tier.id + '">Add ' + esc(d.label) + " to calendar</button>";
-        }).join("") + (D.invite ? '<button type="button" class="btn btn-small" data-invite-open="invite">' + esc(D.invite.confirmButton) + "</button>" : "") +
+        }).join("") + (I ? '<button type="button" class="btn btn-small" data-invite-open="invite">' + esc(I.inviteFriend) + "</button>" : "") +
         '<button type="button" class="btn btn-small" id="reg-again">Register someone else</button></div>' +
       "</div>";
-    renderGifts();
+    $("order").hidden = true;
     rollify($("reg-out"));
     $("reg-confirm").focus();
     fireConfetti();
@@ -1450,6 +1541,10 @@
       wireForm(); lightScenes(); prepReveal($("register"), true); rollify($("register"));
       $("f-name").focus();
     });
+  }
+  function markGuestSent(i) {
+    var el = $("guest-status-" + i), g = state.reg.guests[i];
+    if (el && g) el.textContent = fill(D.invite.guestSent, { email: g.sentTo });
   }
 
   function rerenderTimes() {
