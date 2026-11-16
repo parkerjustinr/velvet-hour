@@ -53,7 +53,7 @@
     var asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
     return asUtc - Math.floor(date.getTime() / 1000) * 1000;
   }
-  // "2026-11-14" + "09:00" in the event time zone -> a real Date.
+  // "2027-11-19" + "09:00" in the event time zone -> a real Date.
   function zoned(dateStr, timeStr) {
     var d = dateStr.split("-"), t = timeStr.split(":");
     var guess = Date.UTC(+d[0], +d[1] - 1, +d[2], +t[0], +t[1]);
@@ -74,7 +74,7 @@
       return part ? part.value : tz;
     } catch (e) { return tz; }
   }
-  // "2026-11-20" -> "2026-11-21", for sessions that end after midnight.
+  // "2027-11-19" -> "2027-11-20", for sessions that end after midnight.
   function nextDate(dateStr) {
     var d = dateStr.split("-");
     return new Date(Date.UTC(+d[0], +d[1] - 1, +d[2] + 1)).toISOString().slice(0, 10);
@@ -235,8 +235,8 @@
     var f = p.face || [0.5, 0.3, 2.5], z = f[2], zy = z * 1.25;
     var px = z > 1 ? Math.max(0, Math.min(100, (f[0] * z - 0.5) / (z - 1) * 100)) : 50;
     var py = zy > 1 ? Math.max(0, Math.min(100, (f[1] * zy - 0.5) / (zy - 1) * 100)) : 50;
-    return '<span class="s-face' + (p.plain ? "" : " is-duotone") + '" data-artist="' + esc(p.id) + '" style="background-image:url(' + esc(p.photo) +
-      ");background-size:" + Math.round(z * 100) + "% auto;background-position:" + px.toFixed(1) + "% " + py.toFixed(1) + '%"></span>';
+    return '<button type="button" class="s-face' + (p.plain ? "" : " is-duotone") + '" data-artist="' + esc(p.id) + '" aria-label="' + esc(p.name) + '" aria-haspopup="dialog" style="background-image:url(' + esc(p.photo) +
+      ");background-size:" + Math.round(z * 100) + "% auto;background-position:" + px.toFixed(1) + "% " + py.toFixed(1) + '%"></button>';
   }
 
   R.schedule = function () {
@@ -262,18 +262,24 @@
         : '<div class="day-panel" role="tabpanel" id="panel-' + day.id + '" aria-labelledby="tab-' + day.id + '"' + (i ? " hidden" : "") + ' tabindex="0">') +
         '<ol class="sessions">' + sorted.map(function (x) {
           var t = sessionTimes(day, x), tr = byId(D.tracks, x.track);
-          // Performers: small round faces (overlapping when there are several), then names. Both open the artist popup.
+          // One line per session: a toggle button (time and title), the performers' round faces (each a button
+          // that opens the artist popup) and the location tag. The names and the description sit in a panel
+          // that opens from the toggle, closed by default. No animation.
           var people = (x.speakers || []).map(function (id) { return byId(D.speakers.items, id); }).filter(Boolean);
-          var spk = people.length ? '<span class="s-faces" aria-hidden="true">' + people.filter(function (p) { return p.photo; }).map(face).join("") + "</span>" +
-            '<span class="s-names">' + people.map(function (p) {
+          var withPhoto = people.filter(function (p) { return p.photo; });
+          var names = people.length ? '<p class="s-speakers">' + people.map(function (p) {
               return '<button type="button" class="s-person" data-artist="' + esc(p.id) + '" aria-haspopup="dialog">' + esc(p.name) + "</button>";
-            }).join(", ") + "</span>" : "";
+            }).join(", ") + "</p>" : "";
           return '<li class="session track-' + trackIndex(x.track) + '" id="session-' + x.id + '">' +
-            '<span class="s-time"><time datetime="' + t.start.toISOString() + '">' + esc(t.label) + "</time></span>" +
-            '<div class="s-body"><h3 class="s-title">' + esc(x.title) + "</h3>" +
-              (spk ? '<p class="s-speakers">' + spk + "</p>" : "") +
-              (x.detail ? '<p class="s-detail">' + copy(x.detail) + "</p>" : "") + "</div>" +
-            (tr ? '<span class="s-track">' + esc(tr.name) + "</span>" : "") +
+            '<div class="s-row">' +
+              '<h3 class="s-head"><button type="button" class="s-toggle" aria-expanded="false" aria-controls="sm-' + x.id + '">' +
+                '<span class="s-time"><time datetime="' + t.start.toISOString() + '"><span>' + esc(fmtTime(t.start)) + "</span> - <span>" + esc(fmtTime(t.end)) + "</span></time></span>" +
+                '<span class="s-title">' + esc(x.title) + "</span>" +
+                '<span class="s-plus" aria-hidden="true">+</span></button></h3>' +
+              (withPhoto.length ? '<span class="s-faces">' + withPhoto.map(face).join("") + "</span>" : "") +
+              (tr ? '<span class="s-track">' + esc(tr.name) + "</span>" : "") +
+            "</div>" +
+            '<div class="s-more" id="sm-' + x.id + '" hidden>' + names + (x.detail ? '<p class="s-detail">' + copy(x.detail) + "</p>" : "") + "</div>" +
           "</li>";
         }).join("") + "</ol>" +
         '<button type="button" class="btn btn-small ics-btn" data-ics-day="' + day.id + '">Add ' + esc(day.label) + " to calendar</button>" +
@@ -318,33 +324,58 @@
   R.tickets = function () {
     var t = D.tickets;
     state.tier = state.tier || t.recommended || t.tiers[0].id;
-    var head = '<thead><tr><td class="m-corner"></td>' + t.tiers.map(function (tier) {
+    // Single-night tiers are the matrix columns. Passes that cover more than one night (Both nights) get one
+    // full-width row under the matrix instead. Rows with nothing in any column (a pass-only saving) move there too.
+    var cols = t.tiers.filter(function (x) { return !(x.days > 1); }), passes = t.tiers.filter(function (x) { return x.days > 1; });
+    function empty(v) { return !v || v === "no"; }
+    var rows = t.rows.filter(function (row) { return cols.some(function (c) { return !empty(row.tiers[c.id]); }); });
+    var head = '<thead><tr><td class="m-corner"></td>' + cols.map(function (tier) {
       return '<th scope="col" class="m-col c-' + tier.id + (tier.id === t.recommended ? " is-rec" : "") + '"><label class="m-pick">' +
         '<input type="radio" name="tier" value="' + tier.id + '"' + (tier.id === state.tier ? " checked" : "") + ">" +
         (tier.id === t.recommended ? '<span class="m-rec">Best value</span>' : "") +
         '<span class="m-name">' + esc(tier.name) + '</span><span class="m-price">' + esc(tier.price) + '</span><span class="m-note">' + esc(tier.note || "") + "</span></label></th>";
     }).join("") + "</tr></thead>";
     var lastGroup = null, body = "";
-    t.rows.forEach(function (row) {
+    rows.forEach(function (row) {
       if (row.group && row.group !== lastGroup) {
-        body += '<tr class="m-group"><th scope="rowgroup" colspan="' + (t.tiers.length + 1) + '">' + esc(row.group) + "</th></tr>";
+        body += '<tr class="m-group"><th scope="rowgroup" colspan="' + (cols.length + 1) + '">' + esc(row.group) + "</th></tr>";
         lastGroup = row.group;
       }
       body += '<tr class="m-row" data-row="' + row.id + '"><th scope="row"><button type="button" class="m-label" aria-expanded="false" aria-controls="detail-' + row.id + '">' +
         esc(row.label) + '<span class="m-more" aria-hidden="true">+</span></button></th>' +
-        t.tiers.map(function (tier) { return '<td class="c-' + tier.id + '" data-tier="' + esc(tier.name) + '">' + cell(row.tiers[tier.id]) + "</td>"; }).join("") + "</tr>" +
-        '<tr class="m-detail" id="detail-' + row.id + '" hidden><td colspan="' + (t.tiers.length + 1) + '"><div class="pv">' + rowPreviewHtml(row) + "</div></td></tr>";
+        cols.map(function (tier) { return '<td class="c-' + tier.id + '" data-tier="' + esc(tier.name) + '">' + cell(row.tiers[tier.id]) + "</td>"; }).join("") + "</tr>" +
+        '<tr class="m-detail" id="detail-' + row.id + '" hidden><td colspan="' + (cols.length + 1) + '"><div class="pv">' + rowPreviewHtml(row) + "</div></td></tr>";
     });
-    var nums = t.tiers.map(function (x) { return priceNum(x.price); });
-    var perDay = nums.every(function (n, i) { return n !== null && t.tiers[i].days; })
-      ? '<tfoot><tr><th scope="row">' + esc(t.perDayLabel || "Cost per day") + "</th>" + t.tiers.map(function (tier, i) {
+    var nums = cols.map(function (x) { return priceNum(x.price); });
+    var perDay = nums.every(function (n, i) { return n !== null && cols[i].days; })
+      ? '<tfoot><tr><th scope="row">' + esc(t.perDayLabel || "Cost per day") + "</th>" + cols.map(function (tier, i) {
           return '<td class="c-' + tier.id + '" data-tier="' + esc(tier.name) + '">$' + Math.round(nums[i] / tier.days) + "</td>";
         }).join("") + "</tr></tfoot>" : "";
-    var table = '<table class="matrix" id="matrix" style="--tiers:' + t.tiers.length + '"><caption class="sr">What each ticket includes</caption>' + head + "<tbody>" + body + "</tbody>" + perDay + "</table>";
+    var table = '<table class="matrix" id="matrix" style="--tiers:' + cols.length + '"><caption class="sr">What each ticket includes</caption>' + head + "<tbody>" + body + "</tbody>" + perDay + "</table>";
+    // One full-width row per pass: what it covers, the price, the saving and its own button.
+    var passRows = passes.map(function (p) {
+      var covers = t.rows.filter(function (row) { return !empty(row.tiers[p.id]) && rows.indexOf(row) > -1; }).map(function (row) {
+        var v = row.tiers[p.id];
+        return esc(row.label) + (v === "yes" ? "" : " (" + esc(v) + ")");
+      });
+      var saving = t.rows.filter(function (row) { return !empty(row.tiers[p.id]) && rows.indexOf(row) < 0 && row.detail; }).map(function (row) { return copy(row.detail); }).join(" ");
+      var n = priceNum(p.price);
+      return '<div class="pass-row" data-pass="' + esc(p.id) + '">' +
+        '<div class="pass-main">' +
+          (p.id === t.recommended ? '<span class="m-rec">Best value</span>' : "") +
+          '<p class="pass-name">' + esc(p.name) + '</p><p class="pass-note">' + esc(p.note || "") + "</p>" +
+          (covers.length ? '<p class="pass-covers">' + esc(t.passCovers || "Covers") + ": " + covers.join(", ") + "</p>" : "") +
+          (saving ? '<p class="pass-save">' + saving + "</p>" : "") +
+        "</div>" +
+        '<p class="pass-price"><span class="m-price">' + esc(p.price) + "</span>" +
+          (n !== null && p.days ? '<span class="pass-per">' + esc(t.perDayLabel || "Cost per day") + " $" + Math.round(n / p.days) + "</span>" : "") + "</p>" +
+        '<button type="button" class="btn pass-pick" data-pass="' + esc(p.id) + '" aria-pressed="false">' + esc(fill(t.passPick || "Choose {name}", { name: p.name })) + "</button>" +
+      "</div>";
+    }).join("");
     var preview = '<aside class="preview" id="preview" aria-live="polite" aria-label="Row preview"><p class="pv-empty">Hover or focus a row to see exactly what it covers.</p></aside>';
     return sectionShell("tickets", t.heading,
       (t.intro ? '<p class="lede">' + copy(t.intro) + "</p>" : "") +
-      '<fieldset class="matrix-wrap"><legend class="sr">Choose a ticket</legend><div class="matrix-layout">' + table + preview + "</div></fieldset>" +
+      '<fieldset class="matrix-wrap"><legend class="sr">Choose a ticket</legend><div class="matrix-layout">' + table + preview + "</div>" + passRows + "</fieldset>" +
       '<div class="matrix-cta"><div class="matrix-cta-row"><a class="btn btn-primary" href="#register" id="tier-cta"></a>' +
       (D.invite ? '<button type="button" class="btn" data-invite-open="invite">' + esc(D.invite.inviteFriend) + "</button>" : "") + "</div>" +
       (t.footnote ? '<p class="note">' + copy(t.footnote) + "</p>" : "") + "</div>");
@@ -1085,11 +1116,7 @@
     document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
       var person = e.target.closest(".s-person, .s-face");
-      if (person) {
-        var pid = person.getAttribute("data-artist");
-        open(pid, person.classList.contains("s-person") ? person : person.closest(".s-body").querySelector('.s-person[data-artist="' + pid + '"]'));
-        return;
-      }
+      if (person) { open(person.getAttribute("data-artist"), person); return; }
       var hit = e.target.closest(".sp-hit");
       if (!hit || e.target.closest("a")) return;
       open(hit.getAttribute("data-artist"), hit.querySelector(".sp-open"));
@@ -1399,9 +1426,14 @@
       Array.prototype.forEach.call(m.querySelectorAll("th.m-col, td[class^='c-']"), function (c) {
         c.classList.toggle("is-sel", c.classList.contains("c-" + id));
       });
-      var radio = m.querySelector('input[value="' + id + '"]');
-      if (radio) radio.checked = true;
+      // A pass has no column: every column radio is cleared and its own row shows the selection instead.
+      Array.prototype.forEach.call(m.querySelectorAll('input[name="tier"]'), function (r) { r.checked = r.value === id; });
     }
+    Array.prototype.forEach.call(document.querySelectorAll(".pass-row"), function (row) {
+      var on = row.getAttribute("data-pass") === id;
+      row.classList.toggle("is-sel", on);
+      row.querySelector(".pass-pick").setAttribute("aria-pressed", String(on));
+    });
     var cta = $("tier-cta");
     if (cta && tier) { cta.innerHTML = "Register with " + esc(tier.name) + ", " + esc(tier.price) + ' <span class="arrow" aria-hidden="true">&rarr;</span>'; rollOne(cta); }
     // The registration ticket follows the matrix column (keeping its night) and updates the order summary.
@@ -1414,6 +1446,9 @@
     if (!m) return;
     var preview = $("preview");
     m.addEventListener("change", function (e) { if (e.target.name === "tier") setTier(e.target.value); });
+    Array.prototype.forEach.call(document.querySelectorAll(".pass-pick"), function (b) {
+      b.addEventListener("click", function () { setTier(b.getAttribute("data-pass")); });
+    });
     function show(rowEl) {
       Array.prototype.forEach.call(m.querySelectorAll(".m-row"), function (r) { r.classList.toggle("is-hot", r === rowEl); });
       var row = byId(D.tickets.rows, rowEl.getAttribute("data-row"));
@@ -1605,6 +1640,14 @@
         var tier = ics.getAttribute("data-ics-tier");
         var copyDay = { id: day.id, date: day.date, label: day.label, sessions: day.sessions.filter(function (s) { return !tier || !s.tiers || s.tiers.indexOf(tier) > -1; }) };
         downloadIcs([copyDay], (D.meta.shortName || "event") + "-" + day.id + ".ics");
+        return;
+      }
+      // Run of show: the toggle, or a click on the row outside its buttons, shows or hides the session's details.
+      var row = t.closest(".s-row");
+      if (row && (t.closest(".s-toggle") || !t.closest("button, a"))) {
+        var tg = row.querySelector(".s-toggle"), show = tg.getAttribute("aria-expanded") !== "true";
+        tg.setAttribute("aria-expanded", String(show));
+        $(tg.getAttribute("aria-controls")).hidden = !show;
         return;
       }
       // "Pick your night" links open that night's tab and bring the run of show into view.
