@@ -2,16 +2,16 @@
   "meta": {
     "name": "Velvet Hour",
     "shortName": "VH",
-    "year": "2026",
+    "year": "2027",
     "tagline": "A live-band soul and funk revue built to get the whole room dancing.",
     "timezone": "America/New_York",
     "tzLabel": "ET",
-    "dates": "Fri, Nov 20 - Sat, Nov 21, 2026",
+    "dates": "Fri, Nov 19 - Sat, Nov 20, 2027",
     "venue": "The Anthem",
     "city": "Washington, DC",
     "address": "901 Wharf St SW, Washington, DC 20024",
     "pageTitle": "Velvet Hour - A two-night soul and funk revue, Washington DC",
-    "description": "Two nights of live-band soul and funk at The Anthem on DC's Wharf: Slow Burn on Fri, Nov 20 and Full Funk on Sat, Nov 21, 2026. A fictional event for the Happily Design Jam.",
+    "description": "Two nights of live-band soul and funk at The Anthem on DC's Wharf: Slow Burn on Fri, Nov 19 and Full Funk on Sat, Nov 20, 2027. A fictional event for the Happily Design Jam.",
     "footerLine": "Fictional event made for the Happily Design Jam.",
     "creditLine": "Photos: Unsplash"
   },
@@ -42,8 +42,8 @@
     "nights": {
       "heading": "Pick your night",
       "items": [
-        {"day": "n1", "date": "Fri Nov 20", "name": "Slow Burn", "link": "See Friday's run of show", "points": [{"text": "Slow jams and ballads all night", "track": "stage"}, {"text": "June Halloway's ballad duet", "track": "stage"}, {"text": "The Heart Cam during the slow jam", "track": "floor"}, {"text": "A slow dance under the mirror ball to close", "track": "floor"}]},
-        {"day": "n2", "date": "Sat Nov 21", "name": "Full Funk", "link": "See Saturday's run of show", "points": [{"text": "Horn section up front", "track": "stage"}, {"text": "A surprise guest", "track": "stage"}, {"text": "A Dance Cam dance-off", "track": "floor"}, {"text": "Gold confetti cannons for the finale", "track": "stage"}, {"text": "Afterparty until 2 AM", "track": "lounge"}]}
+        {"day": "n1", "date": "Fri Nov 19", "name": "Slow Burn", "link": "See Friday's run of show", "points": [{"text": "Slow jams and ballads all night", "track": "stage"}, {"text": "June Halloway's ballad duet", "track": "stage"}, {"text": "The Heart Cam during the slow jam", "track": "floor"}, {"text": "A slow dance under the mirror ball to close", "track": "floor"}]},
+        {"day": "n2", "date": "Sat Nov 20", "name": "Full Funk", "link": "See Saturday's run of show", "points": [{"text": "Horn section up front", "track": "stage"}, {"text": "A surprise guest", "track": "stage"}, {"text": "A Dance Cam dance-off", "track": "floor"}, {"text": "Gold confetti cannons for the finale", "track": "stage"}, {"text": "Afterparty until 2 AM", "track": "lounge"}]}
       ],
       "note": "Two nights, two setlists. No song is played twice."
     }
@@ -202,8 +202,8 @@
       {
         "id": "n1",
         "label": "Fri - Slow Burn",
-        "date": "2026-11-20",
-        "title": "Friday, Nov 20",
+        "date": "2027-11-19",
+        "title": "Friday, Nov 19",
         "sessions": [
           {"id": "n1-sound", "start": "17:00", "end": "17:45", "title": "Soundcheck and band Q&A", "track": "stage", "speakers": ["theo", "brass"], "detail": "The band runs the ballads at half volume, then takes your questions.", "tiers": ["vip"]},
           {"id": "n1-early", "start": "18:00", "end": "18:30", "title": "Early entry", "track": "lounge", "speakers": [], "detail": "In before the doors open. Front Rail heads straight to the rail.", "tiers": ["rail", "vip"]},
@@ -226,8 +226,8 @@
       {
         "id": "n2",
         "label": "Sat - Full Funk",
-        "date": "2026-11-21",
-        "title": "Saturday, Nov 21",
+        "date": "2027-11-20",
+        "title": "Saturday, Nov 20",
         "sessions": [
           {"id": "n2-sound", "start": "17:00", "end": "17:45", "title": "Soundcheck and band Q&A", "track": "stage", "speakers": ["theo", "brass"], "detail": "Watch the horns rehearse the dance-off breaks, then ask them anything.", "tiers": ["vip"]},
           {"id": "n2-early", "start": "18:00", "end": "18:30", "title": "Early entry", "track": "lounge", "speakers": [], "detail": "In before the doors open. Front Rail heads straight to the rail.", "tiers": ["rail", "vip"]},
@@ -255,6 +255,8 @@
     "intro": "Every ticket is for one night: pick Slow Burn or Full Funk. Want both? The Both nights pass covers Dance Floor on Friday and Saturday for less than two singles. Pick a column to choose a ticket. Hover or tap a row to see exactly what it covers.",
     "recommended": "both",
     "perDayLabel": "Per night",
+    "passCovers": "Covers",
+    "passPick": "Choose {name}",
     "tiers": [
       {"id": "balcony", "name": "Balcony", "price": "$75", "note": "One night, seated", "days": 1},
       {"id": "floor", "name": "Dance Floor", "price": "$85", "note": "One night, standing", "days": 1},
@@ -278,7 +280,7 @@
     "bothNights": {
       "label": "Both nights",
       "night": "Slow Burn and Full Funk",
-      "date": "Nov 20 and 21"
+      "date": "Nov 19 and 20"
     }
   },
 
@@ -322,9 +324,9 @@
     "snapLabel": "Take a snapshot",
     "saveLabel": "Save to my device",
     "closeLabel": "Close",
-    "snapAlt": "Your Dance Cam snapshot on a Polaroid-style card that reads Velvet Hour, Nov 2026",
+    "snapAlt": "Your Dance Cam snapshot on a Polaroid-style card that reads Velvet Hour, Nov 2027",
     "saveHint": "On iPhone, you can also press and hold the picture to save it.",
-    "polaroidText": "Velvet Hour, Nov 2026",
+    "polaroidText": "Velvet Hour, Nov 2027",
     "privacy": "Nothing is recorded, uploaded or sent anywhere. The picture is made in your browser and stays on your device. A snapshot is only kept if you press Save, and it saves to your own device.",
     "liveLine": "You're on the Dance Cam. The picture stays on this device.",
     "offLine": "Camera off. June Halloway is back on the floor in demo mode.",

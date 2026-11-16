@@ -287,25 +287,53 @@ main:focus { outline: none; }
 .day-panel[hidden] { display: none; }
 .day-single { font-size: 1.5rem; margin-bottom: 8px; }
 .sessions { margin-bottom: 20px; border: var(--rule); border-top: 0; }
-.session { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 14px 14px 16px 16px; border-bottom: var(--hair); border-left: 8px solid var(--track, var(--chrome)); scroll-margin-top: 120px; transition: background-color 400ms ease; }
+/* One line per session: toggle (time, title), round faces, location tag. Details open below, no animation. */
+.session { padding: 10px 12px 10px 14px; border-bottom: var(--hair); border-left: 8px solid var(--track, var(--chrome)); scroll-margin-top: 120px; transition: background-color 400ms ease; }
 .session:last-child { border-bottom: 0; }
 .session.is-flash { background: var(--bg-2); }
-.s-time { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--chrome); }
-.s-title { font-family: var(--body); font-weight: 800; font-size: 1.3rem; line-height: 1.2; }
-/* Performers: overlapping round faces (same duotone as the lineup), then names. Both open the artist popup. */
-.s-speakers { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 0; font-weight: 600; }
+.s-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; cursor: pointer; }
+.s-head { margin: 0; font: inherit; min-width: 0; }
+.s-toggle { appearance: none; display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; align-items: baseline; gap: 8px; width: 100%; padding: 4px 0; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.s-time { font-weight: 700; font-size: 0.85rem; line-height: 1.3; font-variant-numeric: tabular-nums; color: var(--chrome); }
+.s-time time > span { white-space: nowrap; }
+.s-title { font-family: var(--body); font-weight: 800; font-size: 1.05rem; line-height: 1.25; }
+.s-plus { font-size: 1.2rem; line-height: 1; color: var(--chrome); }
+.s-toggle[aria-expanded="true"] .s-plus { transform: rotate(45deg); }
+.s-toggle:hover .s-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.s-more { padding: 2px 0 6px 82px; }
+.s-more[hidden] { display: none; }
+/* Performers: overlapping round faces (same duotone as the lineup). Each opens the artist popup. */
+.s-speakers { margin: 4px 0 0; font-weight: 600; }
 .s-faces { display: inline-flex; flex: none; }
-.s-faces:empty { display: none; }
-.s-face { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bg); background-color: var(--bg-2); background-repeat: no-repeat; cursor: pointer; }
-.s-face + .s-face { margin-left: -10px; }
+.s-face { appearance: none; width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 2px solid var(--bg); background-color: var(--bg-2); background-repeat: no-repeat; cursor: pointer; }
+.s-face + .s-face { margin-left: -12px; }
 .s-face.is-duotone { filter: url(#duotone); }
+.s-face:focus-visible { position: relative; z-index: 1; }
 .session.is-flash .s-face { border-color: var(--bg-2); }
 .s-person { appearance: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .s-person:hover { text-decoration-thickness: 2px; }
 .s-detail { margin: 4px 0 0; color: var(--muted); }
-.s-track { justify-self: start; font-size: 0.85rem; font-weight: 700; padding: 2px 10px; background: var(--track); color: var(--on-track); }
+.s-track { justify-self: end; font-size: 0.72rem; font-weight: 700; padding: 1px 6px; white-space: nowrap; background: var(--track); color: var(--on-track); }
+/* From 560px the faces and tag columns have fixed widths, so the + and every column line up row to row. */
+@media (min-width: 560px) {
+  .s-row { grid-template-columns: minmax(0, 1fr) 80px 96px; }
+  .s-faces { grid-column: 2; justify-content: flex-end; }
+  .s-track { grid-column: 3; }
+}
+/* Narrow phones: the tag tucks under the time (inside the time column) so the title keeps most of the row. */
+@media (max-width: 559px) {
+  .s-row { position: relative; grid-template-columns: minmax(0, 1fr) auto; }
+  .s-toggle { padding-bottom: 26px; }
+  .s-track { position: absolute; left: 0; bottom: 8px; max-width: 74px; }
+}
 @media (min-width: 760px) {
-  .session { grid-template-columns: 170px 1fr auto; gap: 20px; align-items: baseline; padding-left: 20px; }
+  .session { padding: 8px 14px 8px 20px; }
+  .s-row { gap: 16px; }
+  .s-toggle { grid-template-columns: 170px minmax(0, 1fr) auto; gap: 20px; }
+  .s-time { font-size: 1rem; }
+  .s-title { font-size: 1.2rem; }
+  .s-more { padding-left: 190px; }
+  .s-track { font-size: 0.85rem; padding: 2px 10px; }
 }
 
 /* ---------- ticket matrix ---------- */
@@ -343,6 +371,21 @@ td.is-sel .yes { color: var(--gold); }
 .matrix tfoot th { text-align: left; font-weight: 800; }
 .matrix tfoot td { font-weight: 700; }
 .matrix-cta { display: grid; gap: 10px; justify-items: start; }
+/* A pass (Both nights) is one full-width row under the matrix. Gold when it is the selected ticket. */
+.pass-row { display: grid; gap: 12px; align-items: center; margin-top: 20px; padding: 16px; border: var(--rule); }
+.pass-row.is-sel { background: var(--gold); color: var(--on-gold); border-color: var(--gold); }
+.pass-row.is-sel .m-rec { background: var(--on-gold); color: var(--gold); }
+.pass-main { display: grid; gap: 4px; justify-items: start; }
+.pass-main p { margin: 0; }
+.pass-name { font-weight: 800; font-size: 1.1rem; line-height: 1.15; }
+.pass-note, .pass-per { font-size: 0.9rem; color: var(--muted); }
+.pass-row.is-sel .pass-note, .pass-row.is-sel .pass-per { color: inherit; }
+.pass-price { display: grid; margin: 0; }
+.pass-pick { justify-self: start; }
+.pass-row.is-sel .pass-pick { background: var(--bg); color: var(--fg); border-color: var(--bg); }
+@media (min-width: 880px) {
+  .pass-row { grid-template-columns: 1fr auto auto; gap: 24px; padding: 18px 20px; }
+}
 .matrix-cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* Phones: every row stacks - label on top, one small cell per tier underneath. No sideways scroll. */
